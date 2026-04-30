@@ -1,0 +1,4 @@
+La bioinformatica combina biologia, informatica y estadistica.
+En bioinformatica se analizan secuencias, genes, proteinas y datos biologicos.
+La programacion permite automatizar tareas, contar palabras, buscar patrones y comparar secuencias.
+Este texto de prueba sirve para contar palabras y generar una nube de palabras.
