@@ -76,63 +76,26 @@ def guardar_csv(mediciones, ruta):
     dataframe.to_csv(ruta, index=False)
 
 
-def puntos_svg(mediciones, columna, ancho, alto, margen, max_limite, max_tiempo):
-    puntos = []
-    for limite, tiempo_basico, tiempo_mejorado in mediciones:
-        tiempo = tiempo_basico if columna == "basico" else tiempo_mejorado
-        x = margen + (limite / max_limite) * (ancho - 2 * margen)
-        y = alto - margen - (tiempo / max_tiempo) * (alto - 2 * margen)
-        puntos.append(f"{x:.2f},{y:.2f}")
-    return " ".join(puntos)
-
-
-def guardar_svg(mediciones, ruta):
-    ancho = 760
-    alto = 420
-    margen = 55
-    max_limite = max(limite for limite, _, _ in mediciones)
-    max_tiempo = max(max(tiempo_basico, tiempo_mejorado) for _, tiempo_basico, tiempo_mejorado in mediciones)
-
-    linea_basica = puntos_svg(mediciones, "basico", ancho, alto, margen, max_limite, max_tiempo)
-    linea_mejorada = puntos_svg(mediciones, "mejorado", ancho, alto, margen, max_limite, max_tiempo)
-
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{ancho}" height="{alto}" viewBox="0 0 {ancho} {alto}">
-  <rect width="100%" height="100%" fill="white"/>
-  <text x="{ancho / 2}" y="26" text-anchor="middle" font-family="Arial" font-size="18">Tiempo para calcular primos</text>
-  <line x1="{margen}" y1="{alto - margen}" x2="{ancho - margen}" y2="{alto - margen}" stroke="black"/>
-  <line x1="{margen}" y1="{margen}" x2="{margen}" y2="{alto - margen}" stroke="black"/>
-  <text x="{ancho / 2}" y="{alto - 12}" text-anchor="middle" font-family="Arial" font-size="13">Limite superior</text>
-  <text x="18" y="{alto / 2}" transform="rotate(-90 18,{alto / 2})" text-anchor="middle" font-family="Arial" font-size="13">Tiempo (segundos)</text>
-  <polyline points="{linea_basica}" fill="none" stroke="#d43f3a" stroke-width="3"/>
-  <polyline points="{linea_mejorada}" fill="none" stroke="#2166ac" stroke-width="3"/>
-  <text x="{ancho - 220}" y="70" font-family="Arial" font-size="14" fill="#d43f3a">Metodo basico</text>
-  <text x="{ancho - 220}" y="94" font-family="Arial" font-size="14" fill="#2166ac">Metodo mejorado</text>
-  <text x="{margen}" y="{alto - 36}" text-anchor="middle" font-family="Arial" font-size="11">0</text>
-  <text x="{ancho - margen}" y="{alto - 36}" text-anchor="middle" font-family="Arial" font-size="11">{max_limite}</text>
-  <text x="{margen - 8}" y="{margen + 4}" text-anchor="end" font-family="Arial" font-size="11">{max_tiempo:.4f}</text>
-</svg>
-"""
-    with open(ruta, "w", encoding="utf-8") as archivo:
-        archivo.write(svg)
-
-
 def guardar_grafico_png(mediciones, ruta):
     dataframe = pd.DataFrame(
         mediciones,
         columns=["Limite", "Metodo basico", "Metodo mejorado"],
     )
 
-    plt.figure(figsize=(9, 5))
-    plt.plot(dataframe["Limite"], dataframe["Metodo basico"], marker="o", label="Metodo basico")
-    plt.plot(dataframe["Limite"], dataframe["Metodo mejorado"], marker="o", label="Metodo mejorado")
-    plt.title("Tiempo para calcular numeros primos")
-    plt.xlabel("Limite superior")
-    plt.ylabel("Tiempo (segundos)")
-    plt.grid(alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(ruta, dpi=180)
-    plt.close()
+    figura, (eje_lineal, eje_log) = plt.subplots(1, 2, figsize=(12, 4.5))
+    for eje, escala in zip((eje_lineal, eje_log), ("lineal", "log")):
+        eje.plot(dataframe["Limite"], dataframe["Metodo basico"], marker="o", label="Metodo basico")
+        eje.plot(dataframe["Limite"], dataframe["Metodo mejorado"], marker="o", label="Metodo mejorado")
+        eje.set_xlabel("Limite superior")
+        eje.set_ylabel("Tiempo (segundos)")
+        eje.set_title(f"Tiempo para calcular primos ({escala})")
+        eje.grid(alpha=0.3)
+        eje.legend()
+    eje_log.set_yscale("log")
+
+    figura.tight_layout()
+    figura.savefig(ruta, dpi=180)
+    plt.close(figura)
 
 
 def main():
@@ -156,7 +119,6 @@ def main():
     limites = [100, 500, 1000, 2000, 5000, 10000]
     mediciones = medir_tiempos(limites)
     guardar_csv(mediciones, RESULTADOS_DIR / "tarea1_tiempos_primos.csv")
-    guardar_svg(mediciones, RESULTADOS_DIR / "tarea1_tiempos_primos.svg")
     guardar_grafico_png(mediciones, RESULTADOS_DIR / "tarea1_tiempos_primos.png")
 
     print("Mediciones de tiempo:")
