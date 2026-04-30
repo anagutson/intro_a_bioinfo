@@ -1,4 +1,4 @@
-"""Ejercicios basicos del TP0 de Bioinformatica.
+"""Ejercicios básicos del TP0 de Bioinformática.
 
 Este archivo muestra variables, listas, condicionales, loops, archivos y
 funciones con ejemplos cortos que se pueden ejecutar desde la terminal.
@@ -35,15 +35,15 @@ def variables_y_print():
     subtitulo("Operaciones sencillas")
     print("entero + decimal =", entero + decimal)
     print("mi_cadena + ' mundo' =", mi_cadena + " mundo")
-    print("Intento de mezclar cadena y numero con +:")
+    print("Intento de mezclar cadena y número con +:")
     try:
         print(mi_cadena + entero)
     except TypeError as error:
         print("Python no permite sumar directamente str + int:", error)
 
     subtitulo("Comentarios")
-    print("Las lineas que empiezan con # son comentarios: Python no las ejecuta.")
-    # Esta linea es un comentario y no modifica el programa.
+    print("Las líneas que empiezan con # son comentarios: Python no las ejecuta.")
+    # Esta línea es un comentario y no modifica el programa.
 
 
 def listas_y_for():
@@ -58,7 +58,7 @@ def listas_y_for():
     print("Luego de append:", mi_lista)
     print("Cantidad de veces que aparece 1:", mi_lista.count(1))
     print("Largo de la lista:", len(mi_lista))
-    print("Elemento en posicion 0:", mi_lista[0])
+    print("Elemento en posición 0:", mi_lista[0])
 
     subtitulo("Recorrido con for")
     print("Recorrido con for:")
@@ -147,22 +147,22 @@ def archivos():
 
     print("\n1) Creo/sobrescribo el archivo con modo 'w'.")
     with open(nombre_archivo, "w", encoding="utf-8") as archivo:
-        archivo.write("Linea inicial del archivo.\n")
+        archivo.write("Línea inicial del archivo.\n")
 
     print("Contenido actual:")
     mostrar_archivo(nombre_archivo)
 
     print("2) Abro el mismo archivo con modo 'a' y agrego texto al final.")
     with open(nombre_archivo, "a", encoding="utf-8") as archivo:
-        archivo.write("Ahora el archivo tiene mas contenido agregado al final.\n")
+        archivo.write("Ahora el archivo tiene más contenido agregado al final.\n")
 
     print("Contenido actual:")
     mostrar_archivo(nombre_archivo)
 
     print("3) Uso modo 'w' otra vez. Esto borra lo anterior y escribe contenido nuevo.")
     with open(nombre_archivo, "w", encoding="utf-8") as archivo:
-        archivo.write("Uhhh! Borre el contenido anterior!\n")
-        archivo.writelines(["linea1\n", "linea2\n"])
+        archivo.write("Uhhh! Borré el contenido anterior!\n")
+        archivo.writelines(["línea1\n", "línea2\n"])
 
     print("Contenido final:")
     mostrar_archivo(nombre_archivo)
@@ -190,13 +190,13 @@ def funciones():
 
     a = 10
     b = 5
-    subtitulo("Funcion original del TP")
-    print("La funcion mi_funcion(var1, var2) devuelve var1 + var2.")
+    subtitulo("Función original del TP")
+    print("La función mi_funcion(var1, var2) devuelve var1 + var2.")
     print("a =", a)
     print("b =", b)
     print("mi_funcion(a, b) =", mi_funcion(a, b))
 
-    subtitulo("Misma funcion con cadenas")
+    subtitulo("Misma función con cadenas")
     print('mi_funcion("bio", "informatica") =', mi_funcion("bio", "informatica"))
     print("Con strings, el operador + concatena texto.")
 

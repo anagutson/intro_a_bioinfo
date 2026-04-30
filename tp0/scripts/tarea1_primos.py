@@ -1,4 +1,4 @@
-"""Tarea 1: numeros primos y comparacion de performance."""
+"""Tarea 1: números primos y comparación de performance."""
 
 import argparse
 import os
@@ -18,7 +18,7 @@ RESULTADOS_DIR = Path("resultados")
 
 
 def es_primo_basico(numero):
-    """Devuelve True si numero es primo, probando todos los divisores menores."""
+    """Devuelve True si número es primo, probando todos los divisores menores."""
     if numero < 2:
         return False
 
@@ -29,7 +29,7 @@ def es_primo_basico(numero):
 
 
 def es_primo_mejorado(numero):
-    """Devuelve True si numero es primo, probando divisores hasta la raiz."""
+    """Devuelve True si número es primo, probando divisores hasta la raíz."""
     if numero < 2:
         return False
     if numero == 2:
@@ -71,7 +71,7 @@ def medir_tiempos(limites):
 def guardar_csv(mediciones, ruta):
     dataframe = pd.DataFrame(
         mediciones,
-        columns=["limite", "tiempo_basico_segundos", "tiempo_mejorado_segundos"],
+        columns=["límite", "tiempo_básico_segundos", "tiempo_mejorado_segundos"],
     )
     dataframe.to_csv(ruta, index=False)
 
@@ -79,14 +79,14 @@ def guardar_csv(mediciones, ruta):
 def guardar_grafico_png(mediciones, ruta):
     dataframe = pd.DataFrame(
         mediciones,
-        columns=["Limite", "Metodo basico", "Metodo mejorado"],
+        columns=["Límite", "Método básico", "Método mejorado"],
     )
 
     figura, (eje_lineal, eje_log) = plt.subplots(1, 2, figsize=(12, 4.5))
     for eje, escala in zip((eje_lineal, eje_log), ("lineal", "log")):
-        eje.plot(dataframe["Limite"], dataframe["Metodo basico"], marker="o", label="Metodo basico")
-        eje.plot(dataframe["Limite"], dataframe["Metodo mejorado"], marker="o", label="Metodo mejorado")
-        eje.set_xlabel("Limite superior")
+        eje.plot(dataframe["Límite"], dataframe["Método básico"], marker="o", label="Método básico")
+        eje.plot(dataframe["Límite"], dataframe["Método mejorado"], marker="o", label="Método mejorado")
+        eje.set_xlabel("Límite superior")
         eje.set_ylabel("Tiempo (segundos)")
         eje.set_title(f"Tiempo para calcular primos ({escala})")
         eje.grid(alpha=0.3)
@@ -99,15 +99,15 @@ def guardar_grafico_png(mediciones, ruta):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Calcula numeros primos y compara performance.")
-    parser.add_argument("--limite", type=int, help="Limite superior definido por el usuario.")
+    parser = argparse.ArgumentParser(description="Calcula números primos y compara performance.")
+    parser.add_argument("--limite", type=int, help="Límite superior definido por el usuario.")
     args = parser.parse_args()
 
     print("Primos del 1 al 20:")
     print(primos_hasta(20, es_primo_basico))
 
     if args.limite is None:
-        entrada = input("Ingrese un limite para buscar primos: ")
+        entrada = input("Ingrese un límite para buscar primos: ")
         limite_usuario = int(entrada)
     else:
         limite_usuario = args.limite
@@ -123,7 +123,7 @@ def main():
 
     print("Mediciones de tiempo:")
     for limite, tiempo_basico, tiempo_mejorado in mediciones:
-        print(f"limite={limite:5d} basico={tiempo_basico:.6f}s mejorado={tiempo_mejorado:.6f}s")
+        print(f"límite={limite:5d} básico={tiempo_basico:.6f}s mejorado={tiempo_mejorado:.6f}s")
     print("Se guardaron los resultados en la carpeta resultados/")
 
 

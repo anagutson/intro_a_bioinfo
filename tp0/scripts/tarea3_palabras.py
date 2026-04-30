@@ -147,7 +147,7 @@ def guardar_barras(conteos, ruta, cantidad=15):
     plt.figure(figsize=(9, 5))
     plt.barh(dataframe["palabra"], dataframe["frecuencia"], color="#386cb0")
     plt.gca().invert_yaxis()
-    plt.title("Palabras mas frecuentes")
+    plt.title("Palabras más frecuentes")
     plt.xlabel("Frecuencia")
     plt.tight_layout()
     plt.savefig(ruta, dpi=180)
@@ -168,7 +168,7 @@ def main():
     conteos = frecuencias(texto)
 
     print(f"La palabra '{palabra}' aparece {apariciones} veces.")
-    print("Frecuencias mas comunes:")
+    print("Frecuencias más comunes:")
     for palabra_frecuente, frecuencia in conteos.most_common(15):
         print(f"{palabra_frecuente}: {frecuencia}")
 
@@ -178,7 +178,7 @@ def main():
     guardar_nube_wordcloud(conteos, RESULTADOS_DIR / "tarea3_nube_wordcloud.png")
     guardar_barras(conteos, RESULTADOS_DIR / "tarea3_frecuencias_top15.png")
     print("Se guardaron los resultados en la carpeta resultados/")
-    print("Excluir palabras muy frecuentes como articulos/preposiciones ayuda a ver mejor los temas del texto.")
+    print("Excluir palabras muy frecuentes como artículos/preposiciones ayuda a ver mejor los temas del texto.")
 
 
 if __name__ == "__main__":

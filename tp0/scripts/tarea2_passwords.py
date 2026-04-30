@@ -8,7 +8,7 @@ implementamos dos enfoques:
   practico cuando hay muchos caracteres disponibles.
 - `generar_password_permutaciones`: recorre permutaciones de 8 caracteres con
   `itertools.permutations` y devuelve la primera que cumple los requisitos.
-  Es mas didactico y directo respecto a la consigna.
+  Es más didáctico y directo respecto a la consigna.
 """
 
 import argparse
@@ -19,7 +19,7 @@ from itertools import permutations
 REQUISITOS_TEXTO = [
     "8 caracteres",
     "al menos 2 letras",
-    "al menos 2 numeros",
+    "al menos 2 números",
     "sin fragmentos consecutivos de 2 caracteres tomados de nombre, fecha o DNI",
 ]
 
@@ -55,7 +55,7 @@ def _separar_caracteres(nombre, fecha, dni):
     letras = [caracter for caracter in solo_alfanumericos(nombre) if caracter.isalpha()]
     numeros = [caracter for caracter in solo_alfanumericos(fecha + dni) if caracter.isdigit()]
     if len(letras) < 2 or len(numeros) < 2:
-        raise ValueError("Se necesitan al menos 2 letras y 2 numeros en los datos de entrada.")
+        raise ValueError("Se necesitan al menos 2 letras y 2 números en los datos de entrada.")
     return letras, numeros
 
 
@@ -80,21 +80,21 @@ def generar_password_aleatorio(nombre, fecha, dni, intentos=10000, semilla=None)
         if cumple_requisitos(password, prohibidos):
             return password
 
-    raise RuntimeError("No se pudo generar una clave valida con esos datos. Pruebe datos mas variados.")
+    raise RuntimeError("No se pudo generar una clave válida con esos datos. Pruebe datos más variados.")
 
 
 def generar_password_permutaciones(nombre, fecha, dni, semilla=7, max_pool=12):
-    """Estrategia didactica: recorrer permutaciones (consigna del TP).
+    """Estrategia didáctica: recorrer permutaciones (consigna del TP).
 
     Como las permutaciones de 8 elementos son `n!/(n-8)!`, tomamos un pool
     chico (max_pool caracteres) elegido al azar para que termine en tiempo
-    razonable. Devolvemos la primera permutacion que cumple los requisitos.
+    razonable. Devolvemos la primera permutación que cumple los requisitos.
     """
     letras, numeros = _separar_caracteres(nombre, fecha, dni)
     prohibidos = pares_prohibidos(nombre, fecha, dni)
 
     generador = random.Random(semilla)
-    pool = list(set(letras + numeros))
+    pool = sorted(set(letras + numeros))
     if len(pool) > max_pool:
         pool = generador.sample(pool, max_pool)
     generador.shuffle(pool)
@@ -104,7 +104,7 @@ def generar_password_permutaciones(nombre, fecha, dni, semilla=7, max_pool=12):
         if cumple_requisitos(password, prohibidos):
             return password
 
-    raise RuntimeError("No se encontro una permutacion valida. Probar con otro pool o semilla.")
+    raise RuntimeError("No se encontró una permutación válida. Probar con otro pool o semilla.")
 
 
 # alias historico para compatibilidad con el notebook anterior

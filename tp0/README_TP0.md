@@ -1,10 +1,10 @@
 # TP0 - Entornos y primeros programas
 
-Entrega preparada para ejecutar con Python 3 desde la terminal.
+Entrega preparada para ejecutar con Python 3 desde la terminal o desde Jupyter Notebook.
 
 ## Entorno
 
-Los paquetes estan instalados en un entorno virtual local `.venv`.
+Los paquetes están instalados en un entorno virtual local `.venv`.
 
 Para activarlo:
 
@@ -24,82 +24,89 @@ python3 -m venv .venv
 - `scripts/`: programas Python del TP.
 - `notebooks/`: notebook de entrega.
 - `data/`: archivos de entrada para probar los programas.
-- `resultados/`: archivos generados por los programas, como graficos y CSV.
+- `resultados/`: archivos generados por los programas, como gráficos y CSV.
 - `requirements.txt`: paquetes usados para recrear el entorno.
 
 ## Archivos principales
 
 - `scripts/inicio.py`: primer programa pedido en el ejercicio 1.
-- `scripts/tp0_ejercicios_basicos.py`: ejercicios basicos agrupados: variables, listas, condicionales, loops, archivos y funciones.
-- `scripts/tarea1_primos.py`: numeros primos, limite definido por usuario, medicion de tiempos y graficos.
-- `scripts/tarea2_passwords.py`: generador de passwords con nombre, fecha de nacimiento y DNI.
-- `scripts/tarea3_palabras.py`: conteo de una palabra, frecuencia de palabras, grafico de barras y nube de palabras.
+- `scripts/tp0_ejercicios_basicos.py`: ejercicios básicos agrupados: variables, listas, condicionales, loops, archivos y funciones.
+- `scripts/tarea1_primos.py`: números primos, límite definido por usuario, medición de tiempos y gráfico comparativo.
+- `scripts/tarea2_passwords.py`: generador de passwords con nombre, fecha de nacimiento y DNI. Incluye una versión aleatoria y otra con `itertools.permutations`.
+- `scripts/tarea3_palabras.py`: conteo de una palabra, frecuencia de palabras, gráfico de barras y nube de palabras.
 - `data/texto_prueba.txt`: archivo de texto para probar la tarea 3.
+- `notebooks/TP0_Bioinformatica_Entrega.ipynb`: notebook limpio y autocontenido.
 - `notebooks/TP0_Bioinformatica_Entrega_ejecutado.ipynb`: notebook ejecutado, recomendado para entregar.
 
-## Como ejecutar
+## Cómo ejecutar
 
 ```bash
 .venv/bin/python scripts/inicio.py
 .venv/bin/python scripts/tp0_ejercicios_basicos.py
 .venv/bin/python scripts/tarea1_primos.py --limite 50
-.venv/bin/python scripts/tarea2_passwords.py --nombre "Elena Gilbert" --fecha "20/04/2005" --dni "40123456"
+.venv/bin/python scripts/tarea2_passwords.py --nombre "Elena Gilbert" --fecha "20/04/2005" --dni "40123456" --metodo permutaciones
 .venv/bin/python scripts/tarea3_palabras.py --archivo data/texto_prueba.txt --palabra bioinformatica
 ```
 
 Para abrir el notebook:
 
 ```bash
-.venv/bin/jupyter notebook notebooks/TP0_Bioinformatica_Entrega_ejecutado.ipynb
+.venv/bin/python -m notebook notebooks/TP0_Bioinformatica_Entrega_ejecutado.ipynb
 ```
 
-## Pseudocodigo de la tarea 1
+## Pseudocódigo de la tarea 1
 
-Un numero primo es un entero mayor que 1 que solo puede dividirse exactamente por 1 y por si mismo.
-Para detectarlo, el programa busca si existe algun divisor intermedio.
+Un número primo es un entero mayor que 1 que solo puede dividirse exactamente por 1 y por sí mismo.
+Para detectarlo, el programa busca si existe algún divisor intermedio.
 
-Version basica:
+Versión básica:
 
 ```text
-para cada numero entre 1 y limite:
-    si numero < 2:
+para cada número entre 1 y límite:
+    si número < 2:
         no es primo
     si no:
         asumir que es primo
-        para cada divisor entre 2 y numero - 1:
-            si numero % divisor == 0:
+        para cada divisor entre 2 y número - 1:
+            si número % divisor == 0:
                 no es primo
-        si ningun divisor lo dividio:
-            guardar/imprimir el numero como primo
+        si ningún divisor lo dividió:
+            guardar/imprimir el número como primo
 ```
 
-El operador `%` calcula el resto de una division. Si `numero % divisor == 0`,
-significa que el divisor entra justo y entonces el numero no es primo.
+El operador `%` calcula el resto de una división. Si `número % divisor == 0`,
+significa que el divisor entra justo y entonces el número no es primo.
 
-Version mejorada:
+Versión mejorada:
 
 ```text
-para cada numero entre 1 y limite:
-    si numero < 2:
+para cada número entre 1 y límite:
+    si número < 2:
         no es primo
-    si numero == 2:
+    si número == 2:
         es primo
-    si numero es par y mayor que 2:
+    si número es par y mayor que 2:
         no es primo
     si no:
         probar divisores impares: 3, 5, 7, ...
-        detenerse cuando divisor * divisor > numero
-        si ningun divisor lo dividio:
+        detenerse cuando divisor * divisor > número
+        si ningún divisor lo dividió:
             es primo
 ```
 
-Por eso, para saber si `n` es primo, alcanza con probar divisores hasta `raiz(n)`.
-Si no aparece ningun divisor hasta ese punto, el numero es primo.
+Por eso, para saber si `n` es primo, alcanza con probar divisores hasta `raíz(n)`.
+Si no aparece ningún divisor hasta ese punto, el número es primo.
 
 ## Respuestas breves
 
 En un loop `for`, la variable elegida toma de a uno los valores de la secuencia. Por ejemplo, en
 `for x in [2, 3, 5]`, primero `x` vale 2, luego 3 y luego 5.
 
-En el conteo de palabras conviene excluir articulos, preposiciones y conectores muy frecuentes
-porque suelen ocupar mucho lugar en la nube sin aportar demasiado significado tematico.
+En la tarea 2 se muestran dos estrategias: una aleatoria, que es práctica para generar claves,
+y otra con permutaciones, que responde de forma más directa a la consigna del TP.
+
+En el conteo de palabras conviene excluir artículos, preposiciones y conectores muy frecuentes
+porque suelen ocupar mucho lugar en la nube sin aportar demasiado significado temático. La nube
+puede servir para explorar rápidamente los temas dominantes de un texto, por ejemplo abstracts
+de papers o respuestas abiertas de una encuesta. También ayuda a detectar muletillas: si una
+palabra aparece muy grande y no aporta contenido, probablemente convenga revisar el texto.
