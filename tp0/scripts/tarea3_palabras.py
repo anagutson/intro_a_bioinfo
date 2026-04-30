@@ -1,8 +1,7 @@
-"""Tarea 3: conteo de palabras, grafico de frecuencias y nube de palabras."""
+"""Tarea 3: conteo de palabras, gráfico de frecuencias y nube de palabras."""
 
 import argparse
 from collections import Counter
-import math
 import os
 from pathlib import Path
 import re
@@ -81,39 +80,7 @@ def guardar_frecuencias_csv(conteos, ruta):
     dataframe.to_csv(ruta, index=False)
 
 
-def guardar_nube_svg(conteos, ruta, max_palabras=40):
-    palabras = conteos.most_common(max_palabras)
-    ancho = 900
-    alto = 620
-    centro_x = ancho / 2
-    centro_y = alto / 2
-    max_frecuencia = max((frecuencia for _, frecuencia in palabras), default=1)
-    colores = ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#386cb0"]
-
-    elementos = []
-    for indice, (palabra, frecuencia) in enumerate(palabras):
-        angulo = indice * 2.4
-        radio = 18 + indice * 9
-        x = centro_x + math.cos(angulo) * radio
-        y = centro_y + math.sin(angulo) * radio
-        tamanio = 14 + int(42 * frecuencia / max_frecuencia)
-        color = colores[indice % len(colores)]
-        elementos.append(
-            f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" '
-            f'font-family="Arial" font-size="{tamanio}" fill="{color}">{palabra}</text>'
-        )
-
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{ancho}" height="{alto}" viewBox="0 0 {ancho} {alto}">
-  <rect width="100%" height="100%" fill="white"/>
-  <text x="{centro_x}" y="32" text-anchor="middle" font-family="Arial" font-size="20">Nube de palabras</text>
-  {"".join(elementos)}
-</svg>
-"""
-    with open(ruta, "w", encoding="utf-8") as archivo:
-        archivo.write(svg)
-
-
-def guardar_nube_wordcloud(conteos, ruta):
+def guardar_nube(conteos, ruta):
     import matplotlib
 
     matplotlib.use("Agg", force=True)
@@ -174,8 +141,7 @@ def main():
 
     RESULTADOS_DIR.mkdir(exist_ok=True)
     guardar_frecuencias_csv(conteos, RESULTADOS_DIR / "tarea3_frecuencias.csv")
-    guardar_nube_svg(conteos, RESULTADOS_DIR / "tarea3_nube_palabras.svg")
-    guardar_nube_wordcloud(conteos, RESULTADOS_DIR / "tarea3_nube_wordcloud.png")
+    guardar_nube(conteos, RESULTADOS_DIR / "tarea3_nube_wordcloud.png")
     guardar_barras(conteos, RESULTADOS_DIR / "tarea3_frecuencias_top15.png")
     print("Se guardaron los resultados en la carpeta resultados/")
     print("Excluir palabras muy frecuentes como artículos/preposiciones ayuda a ver mejor los temas del texto.")
