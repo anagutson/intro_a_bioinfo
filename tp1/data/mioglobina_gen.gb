@@ -1,0 +1,34 @@
+LOCUS       NG_007075_TEACH          465 bp    DNA     linear   PRI 30-APR-2026
+DEFINITION  Teaching GenBank copy of Homo sapiens MB coding region.
+ACCESSION   NG_007075
+VERSION     NG_007075.1
+KEYWORDS    .
+SOURCE      Homo sapiens (human)
+  ORGANISM  Homo sapiens
+            Eukaryota; Metazoa; Chordata; Mammalia; Primates; Hominidae; Homo.
+REFERENCE   1  (bases 1 to 465)
+  AUTHORS   TP1 Bioinformatica 2026
+  TITLE     Local teaching record
+FEATURES             Location/Qualifiers
+     source          1..465
+                     /organism="Homo sapiens"
+                     /mol_type="genomic DNA"
+                     /db_xref="taxon:9606"
+     gene            1..465
+                     /gene="MB"
+     CDS             1..462
+                     /gene="MB"
+                     /codon_start=1
+                     /product="myoglobin"
+                     /protein_id="NP_976311.1"
+                     /translation="MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLEKFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKKGHHEAEIKPLAQSHATKHKIPVKYLEFISECIIQVLQSKHPGDFGADAQGAMNKALELFRKDMASNYKELGFQG"
+ORIGIN
+        1 atggggctca gcgacgggga gtggcaactg gtgctgaatg tgtggggcaa ggtggaggcc
+       61 gacatccccg gccacgggca ggaggtgctg atccgcctgt tcaagggcca ccccgagacc
+      121 ctggagaagt ttgacaagtt caagcacctg aagagcgagg acgagatgaa ggccagcgag
+      181 gacctgaaga agcacggcgc caccgtgctg accgccctgg gcggcatcct gaagaagaag
+      241 ggccaccacg aggccgagat caagcccctg gcccagagcc acgccaccaa gcacaagatc
+      301 ccccgtgaag tacctggagt tcatcagcga gtgcatcatc caggtgctgc agagcaagca
+      361 ccccggcgac ttcggcgccg acgcccaggg cgccatgaac aaggccctgg agctgttccg
+      421 caaggacatg gccagcaact acaaggagct gggcttccag ggctga
+//

@@ -1,0 +1,35 @@
+ID   MYG_HUMAN               Reviewed;         154 AA.
+AC   P02144;
+DT   21-JUL-1986, integrated into UniProtKB/Swiss-Prot.
+DT   23-JAN-2007, sequence version 2.
+DT   29-MAY-2024, entry version 215.
+DE   RecName: Full=Myoglobin;
+DE            EC=1.7.-.-;
+GN   Name=MB;
+OS   Homo sapiens (Human).
+OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Mammalia; Eutheria;
+OC   Euarchontoglires; Primates; Haplorrhini; Catarrhini; Hominidae; Homo.
+OX   NCBI_TaxID=9606;
+CC   -!- FUNCTION: Serves as a reserve supply of oxygen and facilitates the
+CC       movement of oxygen within muscles.
+CC   -!- SUBCELLULAR LOCATION: Cytoplasm.
+CC   -!- SIMILARITY: Belongs to the globin family.
+DR   PDB; 3RGK; X-ray; 1.65 A; A=1-154.
+DR   RefSeq; NP_976311.1; NM_203377.1.
+DR   GeneID; 4151; -.
+DR   Ensembl; ENST00000359787.5; ENSP00000352835.1; ENSG00000198125.
+KW   3D-structure; Acetylation; Cytoplasm; Direct protein sequencing; Heme;
+KW   Iron; Metal-binding; Muscle protein; Oxygen transport; Reference proteome.
+FT   CHAIN           1..154
+FT                   /note="Myoglobin"
+FT   BINDING         65
+FT                   /ligand="heme"
+FT   BINDING         94
+FT                   /ligand="heme"
+FT   MOD_RES         2
+FT                   /note="N-acetylglycine"
+SQ   SEQUENCE   154 AA;  17184 MW;  9EBD489150F7F55A CRC64;
+     MGLSDGEWQL VLNVWGKVEA DIPGHGQEVL IRLFKGHPET LEKFDKFKHL KSEDEMKASE
+     DLKKHGATVL TALGGILKKK GHHEAEIKPL AQSHATKHKI PVKYLEFISE CIIQVLQSKH
+     PGDFGADAQG AMNKALELFR KDMASNYKEL GFQG
+//

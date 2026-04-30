@@ -1,0 +1,28 @@
+Resumen de registros FASTA
+
+gen
+id: NG_007075.1:11026-21591
+name: NG_007075.1:11026-21591
+description: NG_007075.1:11026-21591 MB myoglobin gene region [Homo sapiens] teaching copy
+longitud: 465
+secuencia_inicio: ATGGGGCTCAGCGACGGGGAGTGGCAACTGGTGCTGAATG
+
+mRNA
+id: NM_203377.1
+name: NM_203377.1
+description: NM_203377.1 myoglobin mRNA [Homo sapiens] synthetic teaching copy
+longitud: 863
+secuencia_inicio: GGGTTGCTCTTCTGCCTGCGGCCCAGGACCCCACTGCTCC
+
+proteína
+id: NP_976311.1
+name: NP_976311.1
+description: NP_976311.1 myoglobin isoform 1 [Homo sapiens]
+longitud: 154
+secuencia_inicio: MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPET
+
+GC del gen: 63.66%
+Traducción directa inicia: MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLEKFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKK
+Traducción reversa inicia: SALEAQLLVVAGHVLAEQLQGLVHGALGVGAEVAGVLALQHLDDALADELQVLHGDLVLGGVALGQGLDLGLVVALLLQD
+Proteína real inicia: MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLEKFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKK
+Directa coincide con proteína real: True
