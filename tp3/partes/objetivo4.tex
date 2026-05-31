@@ -1,0 +1,121 @@
+% ============================================================
+%  Objetivo 4 — De humanos a bacterias y viceversa
+% ============================================================
+
+La proteína humana que buscamos como homóloga es la \textbf{guanilato ciclasa soluble (sGC)},
+cuyas subunidades \textbf{GUCY1A1} y \textbf{GUCY1B1} contienen el dominio HNOB en el
+extremo N-terminal.
+
+% ============================================================
+\section{Ejercicio 4a --- Búsqueda de homólogos humanos por distintos métodos}
+
+\begin{consigna}
+Buscar homólogos de la Proteína X en humanos usando: a) BLAST, b) PSI-BLAST, c) Pfam,
+d) PROSITE. ¿Cuál es el método más sensible? ¿Con cuál llegó más rápido al resultado?
+\end{consigna}
+
+\subsection{a) BLAST}
+
+Corrimos BLASTp de la secuencia de \textit{C. tetani} contra nr restringido a
+\textit{Homo sapiens} con parámetros por defecto. La sGC \textbf{no apareció} entre los
+hits significativos. La identidad entre el dominio HNOB de \textit{C. tetani} y el de la
+sGC humana es $\sim$20--25\%, que está por debajo del umbral de sensibilidad de BLAST
+estándar. Con tan baja identidad, los HSPs no alcanzan scores suficientemente altos como
+para ser significativos estadísticamente.
+
+\subsection{b) PSI-BLAST}
+
+Corrimos PSI-BLAST con la secuencia completa de 617 aa contra nr restringido a \textit{Homo
+sapiens}. En la \textbf{iteración 1} no hubo hits significativos (solo 2 lamininas por debajo
+del umbral). A partir de la \textbf{iteración 2} empezaron a aparecer muchos hits, pero todos
+correspondían a proteínas coiled-coil humanas: lamininas, miosinas, nineínas, plectinas y
+desmoplaquinas. En las iteraciones 3 y 4 la PSSM quedó completamente dominada por esas
+proteínas, y la sGC (\textbf{GUCY1A1/GUCY1B1}) no apareció en ninguna iteración.
+
+El problema es que la Proteína X tiene dos dominios: el HNOB (posiciones 1--190), que es el
+que nos conectaría con la sGC, y el MCPsignal (posiciones 331--617), que tiene estructura de
+coiled-coil. Como PSI-BLAST buscó con la secuencia completa, los hits del dominio MCPsignal
+dominaron la PSSM desde la iteración 2, arrastrando la búsqueda hacia proteínas estructuralmente
+similares al MCPsignal y alejándola del dominio HNOB. Este fenómeno se llama \textit{PSSM drift}:
+la matriz se ``contamina'' con información de falsos positivos y la búsqueda diverge del
+homólogo de interés.
+
+Para haber encontrado la sGC con PSI-BLAST habría que buscar solo con la región HNOB (posiciones
+1--190 de la secuencia), de modo que la PSSM se construya únicamente con información del dominio
+sensor de NO y no se vea contaminada por los coiled-coils del MCPsignal.
+
+\subsection{c) Pfam / InterPro}
+
+Este fue el método más directo: al buscar la secuencia en InterPro el dominio HNOB
+(PF07730) queda identificado de inmediato, y desde la página del dominio en Pfam se puede
+navegar directamente a las proteínas humanas con ese dominio en la sección \textit{Taxonomy}.
+Ahí aparecen las subunidades de la sGC (GUCY1A1 y GUCY1B1) sin necesidad de correr ninguna
+búsqueda adicional.
+
+\subsection{d) PROSITE}
+
+El perfil PS50111 que detectó PROSITE en el Objetivo 3 corresponde al dominio MCPsignal,
+no al HNOB, así que no recupera la sGC humana directamente. Para llegar a ella por PROSITE
+habría que buscar el perfil específico de HNOB. Es más sensible que BLAST pero menos práctico
+que Pfam para este caso concreto.
+
+\subsection{Comparación de métodos}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{3cm}P{2.5cm}P{3.5cm}}
+\toprule
+Método & ¿Encuentra sGC? & Sensibilidad & Velocidad \\
+\midrule
+BLAST         & No                    & Baja para homólogos distantes & Rápido \\
+PSI-BLAST     & No (PSSM drift)       & Alta (si se usa solo HNOB)    & Moderado \\
+Pfam/InterPro & Sí, inmediatamente    & Muy alta                      & Muy rápido (navegación directa) \\
+PROSITE       & No con PS50111        & Alta (con el perfil HNOB)     & Moderado \\
+\bottomrule
+\end{tabular}
+\caption{Comparación de métodos para detectar la sGC humana como homóloga de la Proteína X.}
+\end{table}
+
+El \textbf{método más sensible y más rápido} para detectar la sGC resultó ser \textbf{Pfam/InterPro}:
+navegando directamente por el dominio HNOB (PF07730) aparecen las subunidades de la sGC sin
+necesidad de correr ninguna búsqueda iterativa. PSI-BLAST en principio es más sensible que BLAST
+estándar, pero con la secuencia completa de 617 aa sufrió \textit{PSSM drift}: el dominio
+MCPsignal (coiled-coil) dominó la matriz desde la iteración 2 y la sGC no apareció en ninguna de
+las 4 iteraciones que corrimos. Para que PSI-BLAST funcione en este caso habría que usarlo
+únicamente con la región HNOB (posiciones 1--190). BLAST estándar también falla porque la
+identidad entre la Proteína X y la sGC ($\sim$20\%) está por debajo de su umbral de sensibilidad.
+
+% ============================================================
+\section{Ejercicio 4b --- Función propuesta y experimento}
+
+\begin{consigna}
+¿Qué función le asignaría a la Proteína X? Proponga un experimento para confirmarla.
+\end{consigna}
+
+A partir de todo lo analizado, la Proteína X de \textit{Clostridium tetani} sería una
+\textbf{hemoproteína sensora de óxido nítrico acoplada al sistema de quimiotaxis bacteriana}.
+Tiene un dominio HNOB N-terminal que une un grupo hemo y detecta NO en el entorno, y un dominio
+MCPsignal C-terminal que transduciría esa señal al sistema de quimiotaxis. La función propuesta es
+que cuando el sistema inmune del huésped produce NO durante la infección, la bacteria lo detecta a
+través de esta proteína y regula su movimiento en respuesta. Sería una función análoga a la de la
+sGC en mamíferos, que también es activada por NO vía su dominio HNOB, aunque el efector posterior
+es distinto (ciclasa en animales, dominio MCP en bacterias).
+
+Para confirmar esta función proponemos dos experimentos:
+
+\begin{enumerate}
+  \item \textbf{Reconstitución con hemo y espectroscopía UV-Vis.} Expresar el dominio HNOB
+        (posiciones 1--190) de forma recombinante en \textit{E. coli}, reconstituir con hemo
+        exógeno y medir el espectro de absorción (300--700\,nm) en presencia y ausencia de NO.
+        Cuando el NO se une al Fe(II) del hemo se produce un Soret shift característico
+        ($\sim$431 $\rightarrow$ 399\,nm). Si se observa ese desplazamiento, queda demostrado que
+        la proteína une NO a través de su grupo hemo, tal como se predice del análisis de dominios.
+
+  \item \textbf{Complementación funcional en \textit{E. coli}.} Usar una cepa de \textit{E. coli}
+        con deleción de todos sus receptores MCP nativos (\textit{$\Delta$tsr $\Delta$tar $\Delta$trg
+        $\Delta$tap $\Delta$aer}) y expresar en ella la Proteína X de \textit{C. tetani}. Medir la
+        quimiotaxis en placas de motilidad o en ensayos de capilares con gradientes de NO. Si la
+        bacteria recupera capacidad de quimiotaxis dirigida hacia o desde fuentes de NO, quedaría
+        confirmado que el dominio HNOB actúa como sensor y el MCPsignal como efector funcional.
+\end{enumerate}

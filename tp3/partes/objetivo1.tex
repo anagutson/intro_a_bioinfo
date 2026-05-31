@@ -1,0 +1,119 @@
+% ============================================================
+%  Objetivo 1 — Dominios en Conserved Domains (NCBI)
+% ============================================================
+
+La secuencia que usamos en todo el TP es la \textbf{Proteína X} de \textit{Clostridium tetani},
+de 617 aminoácidos. Según los datos del enunciado absorbe luz como una hemoproteína y está
+relacionada con quimiotaxis y estrés oxidativo/nitroxativo.
+
+% ============================================================
+\section{Ejercicio 1a}
+
+\begin{consigna}
+¿Qué clase de proteínas encuentra? ¿Tienen algún grupo prostético? ¿Qué molécula unen y qué
+función tienen informadas?
+\end{consigna}
+
+Corrimos BLASTp contra la base nr sin filtrar por organismo y con todos los parámetros por
+defecto. Los primeros hits fueron:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{2cm}P{2cm}}
+\toprule
+\# & Descripción (accesión) & Organismo & Identidad (\%) \\
+\midrule
+1 & methyl-accepting chemotaxis protein (AAO34825.1) & \textit{C. tetani} E88 & 98.5 \\
+2 & chemotaxis protein (RXI74251.1)                  & \textit{C. tetani}     & 98.2 \\
+3 & chemotaxis protein (RXI44462.1)                  & \textit{C. tetani}     & 98.2 \\
+4 & chemotaxis protein (AVP55927.1)                  & \textit{C. tetani}     & 98.2 \\
+5 & heme NO-binding domain-containing protein (WP\_035125471.1) & \textit{C. tetani} & 98.8 \\
+\bottomrule
+\end{tabular}
+\caption{Primeros hits del BLASTp de la Proteína X contra nr (E-value = 0.0 para todos).}
+\end{table}
+
+Todos los hits son \textbf{proteínas de quimiotaxis de tipo MCP} (\textit{Methyl-accepting
+Chemotaxis Protein}) con un dominio de unión a hemo. Varias aparecen anotadas directamente
+como ``heme NO-binding domain-containing protein'', lo que ya da una pista muy clara de la
+función.
+
+Estas proteínas tienen como \textbf{grupo prostético} un \textbf{grupo hemo} (una porfirina
+con un átomo de hierro en el centro), que está coordinado axialmente por una histidina proximal
+conservada. La molécula que unen es \textbf{óxido nítrico (NO)}, aunque algunas también pueden
+unir O$_2$ dependiendo del organismo. Su función es actuar como \textbf{sensores de NO}
+acoplados al sistema de quimiotaxis: cuando detectan NO en el entorno, transmiten esa señal al
+dominio MCP, que regula el movimiento bacteriano.
+
+% ============================================================
+\section{Ejercicio 1b}
+
+\begin{consigna}
+¿Las de \textit{C. tetani} están poco o muy conservadas? ¿En qué otras especies aparecen
+homólogas? ¿Con qué grado de conservación?
+\end{consigna}
+
+Dentro de \textit{C. tetani} la proteína está \textbf{muy conservada}: las distintas cepas
+tienen entre 98 y 99\% de identidad, con E-value 0.0 en todos los casos. Lo que llama la
+atención es que los 100 hits de la búsqueda pertenecen todos a \textit{Clostridium} o
+Clostridiaceae, sin que aparezca ningún organismo fuera del género con blastp estándar.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.5cm}P{2.5cm}}
+\toprule
+Organismo & Identidad (\%) & E-value \\
+\midrule
+\textit{Clostridium tetani} (otras cepas) & 98--99 & 0.0 \\
+\textit{Clostridium cochlearium}           & $\sim$83 & 0.0 \\
+\textit{Clostridium tetanomorphum}         & $\sim$67 & 0.0 \\
+\textit{Clostridium lundense}              & $\sim$66 & 0.0 \\
+\textit{Clostridium botulinum}             & $\sim$61 & 0.0 \\
+\textit{Clostridium carboxidivorans}       & $\sim$60 & 0.0 \\
+\bottomrule
+\end{tabular}
+\caption{Conservación de la Proteína X en otras especies de \textit{Clostridium}.}
+\end{table}
+
+La identidad cae bastante al salir de \textit{C. tetani}: de 98\% baja a $\sim$83\% en
+\textit{C. cochlearium} y a $\sim$60--67\% en otras especies del género. Esto sugiere que la
+proteína está \textbf{moderadamente conservada} en el género pero que la especificidad de
+secuencia es alta dentro de la especie. Homólogos más distantes (como la guanilato ciclasa
+soluble humana, que también tiene un dominio HNOB) no aparecen con blastp estándar porque la
+identidad cae por debajo del umbral de sensibilidad de BLAST.
+
+% ============================================================
+\section{Ejercicio 1c}
+
+\begin{consigna}
+¿Cuántos dominios presenta la proteína según el NCBI-CDD? ¿De qué fuente se obtuvo cada uno?
+¿Qué funciones tienen descritas?
+\end{consigna}
+
+En la solapa \textbf{Graphic Summary} del resultado de BLAST, el NCBI-CDD identifica
+\textbf{2 dominios} en la Proteína X:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lllP{5.5cm}}
+\toprule
+Dominio & Posición & Fuente & Función \\
+\midrule
+\textbf{HNOB} & $\sim$1--190 aa (N-term.) & CDD/Pfam PF07730 + SMART SM00495 & Unión de grupo hemo; sensor de NO y O$_2$; activa señalización por cambio conformacional \\[4pt]
+\textbf{Tar} (MCP) & $\sim$270--617 aa (C-term.) & CDD/Pfam PF00672 + COG0840 & Transducción de señal en quimiotaxis; incluye sitio de dimerización y unión a CheW \\
+\bottomrule
+\end{tabular}
+\caption{Dominios identificados por NCBI-CDD en la Proteína X.}
+\end{table}
+
+Además de los dos dominios, el Graphic Summary también marca dos sitios funcionales dentro del
+dominio Tar: la \textbf{dimer interface} y el \textbf{putative CheW interface}, que son las
+regiones de contacto con otras subunidades del receptor y con la proteína CheW del sistema de
+quimiotaxis.
+
+Vale aclarar que NCBI-CDD llama ``Tar'' al dominio C-terminal (por el receptor de aspartato
+prototípico de \textit{E. coli}), pero en Pfam el mismo dominio se llama ``MCPsignal'': son
+la misma familia con distinto nombre según la base de datos.

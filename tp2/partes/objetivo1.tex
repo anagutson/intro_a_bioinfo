@@ -1,0 +1,250 @@
+% ============================================================
+%  Objetivo 1.1 — Comparación de 2 secuencias
+% ============================================================
+\section{Objetivo 1.1 — Comparación de 2 secuencias}
+
+\textbf{¿Qué opciones de programas hay y para qué tipo de comparaciones sirven?}
+
+En el formulario de BLAST aparecen cinco opciones:
+
+\begin{itemize}
+  \item \textbf{blastn}: busca una secuencia nucleotídica en una base de nucleótidos.
+  \item \textbf{blastp}: busca una proteína en una base de proteínas (la que usamos en este ejercicio).
+  \item \textbf{blastx}: traduce el query nucleotídico y lo busca en una base de proteínas.
+  \item \textbf{tblastn}: busca una proteína en una base de nucleótidos que el programa traduce.
+  \item \textbf{tblastx}: traduce tanto el query como la base y compara proteínas.
+\end{itemize}
+
+\textbf{¿Qué otras matrices hay disponibles? ¿Conoce sus diferencias?}
+
+Además de BLOSUM62, NCBI BLAST ofrece PAM30, PAM70, PAM250, BLOSUM45, BLOSUM50, BLOSUM80 y BLOSUM90.
+Las matrices BLOSUM se construyen a partir de bloques de secuencias alineadas: el número indica el porcentaje
+de identidad promedio de las secuencias usadas para construirla. BLOSUM62 es la más general y la que mejor
+funciona para la mayoría de las búsquedas. BLOSUM80 sirve cuando las secuencias a comparar son muy similares
+entre sí (>80\% de identidad), porque puntúa mejor las sustituciones conservativas y penaliza más los cambios
+drásticos. BLOSUM45 es la opción para secuencias más divergentes. Las matrices PAM son una familia distinta,
+basada en modelos de evolución de aminoácidos, y se usan menos en la práctica.
+
+\textbf{¿Qué particularidad tienen los gap costs? ¿A qué se debe?}
+
+Los gap costs tienen dos componentes separados: \textbf{existence} (abrir el gap) y \textbf{extension}
+(cada residuo adicional dentro del gap). Esto se conoce como modelo de gap afín y existe porque biológicamente
+no es lo mismo abrir una inserción que extenderla. Abrir un gap corresponde a un evento evolutivo único
+(un indel), mientras que agregar un residuo más dentro de ese mismo gap es menos costoso desde el punto de
+vista evolutivo. Por eso la penalidad de apertura es mucho mayor que la de extensión (11 vs 1 en el default
+de BLOSUM62). Además, los valores disponibles cambian según la matriz porque cada combinación tiene sus
+propios parámetros estadísticos.
+
+% ------------------------------------------------------------
+\subsection{Ejercicio 1.1}
+
+Comparamos la mioglobina humana (P02144, 154\,aa) con la de caballo (P68082, 154\,aa) y cerdo
+(P02189, 154\,aa). Para todas las corridas usamos \textbf{blastp} desde el formulario
+\textit{Align two or more sequences}.
+
+\textbf{i) ¿El alineamiento abarca la secuencia completa de las 2 proteínas? ¿Le parece que es un
+alineamiento local o global? Justifique.}
+
+Sí, en los dos casos el alineamiento abarcó la secuencia completa (cobertura 100\%). BLAST es un algoritmo
+de alineamiento local, pero cuando dos proteínas son tan similares como estas mioglobinas de mamíferos
+($\sim$88\% de identidad), el único HSP significativo termina extendiéndose por toda la longitud de la
+secuencia porque no hay ninguna región de baja similitud que haga conveniente cortarlo antes. El resultado
+se ve prácticamente igual a un alineamiento global, aunque algorítmicamente sigue siendo local.
+
+\textbf{ii) ¿Se observan gaps en el dot-plot? ¿Cuántos? ¿Cómo se identifican?}
+
+No hay gaps en ninguna de las dos comparaciones. El dot-plot muestra una única línea diagonal recta y
+continua de la posición 1 a la 154, sin ningún quiebre ni desplazamiento lateral, lo que es consistente
+con el 0/154 (0\%) de gaps del alineamiento. Si hubiera gaps, la diagonal mostraría saltos o segmentos
+desplazados en paralelo: un gap en la query desplazaría la línea hacia abajo, un gap en el hit hacia la
+derecha. En este caso la diagonal es perfecta.
+
+\textbf{iii) Analice los valores de Score, E-value, Identities, Positives y Gaps.
+¿Qué cambia al modificar la matriz y los gap costs?}
+
+Con parámetros default (BLOSUM62, gap costs 11:1):
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.2cm}P{2.4cm}P{2.4cm}P{2.4cm}P{1.8cm}}
+\toprule
+Organismo & Score bits (raw) & E-value & Identities & Positives & Gaps \\
+\midrule
+Caballo (P68082) & 278 (711) & $7 \times 10^{-103}$ & 136/154 (88\%) & 142/154 (92\%) & 0/154 (0\%) \\
+Cerdo (P02189)   & 276 (705) & $6 \times 10^{-102}$ & 136/154 (88\%) & 144/154 (93\%) & 0/154 (0\%) \\
+\bottomrule
+\end{tabular}
+\caption{BLASTp mioglobina humana vs.\ caballo y cerdo (BLOSUM62, gap costs 11:1).}
+\end{table}
+
+Los dos alineamientos muestran una homología muy alta: E-values cercanos a 0, identidad del 88\% y ningún
+gap. Los Positives (92--93\%) superan las Identities porque varias de las posiciones que difieren son
+sustituciones conservativas, es decir, cambios entre aminoácidos de propiedades similares. Algo que nos
+llamó la atención: caballo y cerdo tienen exactamente la misma identidad (88\%) pero el cerdo tiene un
+Positive más (93\% vs 92\%), lo que indica que sus sustituciones son ligeramente más conservativas que las
+del caballo.
+
+Para analizar el efecto de los parámetros usamos humana vs.\ caballo como referencia:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.2cm}P{2.4cm}P{2.4cm}P{2.4cm}P{1.8cm}}
+\toprule
+Configuración & Score bits (raw) & E-value & Identities & Positives & Gaps \\
+\midrule
+BLOSUM62, 11:1 (default) & 278 (711) & $7 \times 10^{-103}$ & 136/154 (88\%) & 142/154 (92\%) & 0/154 (0\%) \\
+BLOSUM80, 10:1           & 291 (666) & $3 \times 10^{-102}$ & 136/154 (88\%) & 144/154 (93\%) & 0/154 (0\%) \\
+BLOSUM62, 11:2           & 308 (711) & $5 \times 10^{-111}$ & 136/154 (88\%) & 142/154 (92\%) & 0/154 (0\%) \\
+BLOSUM62, 9:1            & 217 (711) & $3 \times 10^{-84}$  & 136/154 (88\%) & 142/154 (92\%) & 0/154 (0\%) \\
+\bottomrule
+\end{tabular}
+\caption{Efecto de la matriz y los gap costs en el alineamiento humana vs.\ caballo.}
+\end{table}
+
+\textbf{a) BLOSUM80:} el raw score bajó de 711 a 666 porque BLOSUM80 tiene valores numéricos distintos
+para cada par de aminoácidos. Pero el score en bits subió (291 vs 278) y los Positives aumentaron
+levemente (93\% vs 92\%). Esto tiene sentido porque BLOSUM80 fue construida con secuencias más similares
+entre sí, entonces es más sensible a las sustituciones conservativas. El E-value empeoró un poco
+($3 \times 10^{-102}$ vs $7 \times 10^{-103}$) por diferencias en los parámetros estadísticos
+$\lambda$ y $K$ propios de esta matriz.
+
+\textbf{b) Gap costs 11:2 (mayor penalidad de extensión):} el raw score se mantuvo en 711 porque el
+alineamiento ya tenía 0 gaps, entonces penalizar más la extensión no cambia nada en el alineamiento en sí.
+Lo llamativo es que el score en bits subió bastante (308) y el E-value mejoró mucho
+($5 \times 10^{-111}$ vs $7 \times 10^{-103}$). Esto pasa porque con gaps más costosos, la probabilidad
+de encontrar un alineamiento igual de bueno por azar es menor, haciendo el resultado estadísticamente
+más significativo.
+
+\textbf{c) Gap costs 9:1 (menor penalidad de extensión):} mismo razonamiento --- el raw score quedó en 711
+porque el alineamiento no tiene gaps. Pero el score en bits cayó fuerte (217) y el E-value empeoró bastante
+($3 \times 10^{-84}$ vs $7 \times 10^{-103}$). Al bajar el costo de los gaps, las secuencias aleatorias
+pueden alcanzar puntajes similares más fácilmente, con lo cual el mismo resultado vale estadísticamente
+mucho menos.
+
+% ============================================================
+%  Objetivo 1.2 — Búsqueda de proteínas homólogas en humanos
+% ============================================================
+\section{Objetivo 1.2 — Búsqueda de proteínas homólogas a la Mb en humanos}
+
+\subsection{Ejercicio 1.2}
+
+\textbf{i) ¿Cómo mejoraría la búsqueda para obtener solo las homólogas a la Mb una sola vez?}
+
+Usando \textbf{RefSeq Select proteins} con el organismo restringido a \textit{Homo sapiens}. RefSeq Select
+tiene una sola entrada representativa por gen, lo que elimina todas las entradas duplicadas que aparecen en
+nr: distintas estructuras cristalográficas de la misma proteína, isoformas con accession diferente,
+secuencias redundantes de distintos proyectos de secuenciación. Con nr sin filtro, la mioglobina sola puede
+aparecer docenas de veces.
+
+\textbf{ii) Describa brevemente cada proteína homóloga encontrada. Compare E-values, scores y
+alineamientos.}
+
+Con BLASTp contra RefSeq Select en \textit{Homo sapiens} con parámetros default encontramos 3 proteínas:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{2cm}P{2cm}P{1.5cm}P{1.5cm}}
+\toprule
+Proteína & Accesion & Score (bits) & E-value & Cobertura & Identidad \\
+\midrule
+myoglobin isoform 1          & NP\_005359.1 & 312  & $1 \times 10^{-111}$  & 100\% & 100\%   \\
+cytoglobin (CYGB)            & NP\_599030.1 & 73.6 & $5 \times 10^{-17}$   & 95\%  & 28.67\% \\
+hemoglobin subunit zeta (HBZ) & NP\_005323.1 & 71.6 & $1 \times 10^{-16}$   & 96\%  & 28.19\% \\
+\bottomrule
+\end{tabular}
+\caption{Proteínas homólogas a la mioglobina humana (BLASTp, RefSeq Select, \textit{Homo sapiens}).}
+\end{table}
+
+La mioglobina misma aparece primero con 100\% de identidad (hit trivial, es la misma proteína). La
+citoglobina y la hemoglobina zeta tienen identidades muy bajas ($\sim$28\%), lo que refleja la divergencia
+evolutiva de las globinas a lo largo de cientos de millones de años. Aun así, los E-values son
+significativos ($5 \times 10^{-17}$ y $1 \times 10^{-16}$), lo que confirma que hay homología real
+aunque sea lejana. La diferencia de score entre la Mb (312 bits) y las otras dos (73--71 bits) es enorme,
+y se ve también en los alineamientos: con la Mb el alineamiento es perfecto, mientras que con CYGB y HBZ
+hay muchas diferencias y algunos gaps.
+
+\textbf{iii) ¿Cuál es la globina humana más parecida a la Mioglobina? ¿Le sorprende algún resultado?}
+
+La más parecida es la \textbf{citoglobina (CYGB)}, con E-value $5 \times 10^{-17}$ y 28.67\% de identidad.
+Tiene sentido porque CYGB es, como la Mb, una globina intracelular monómera --- a diferencia de las
+hemoglobinas, que circulan en la sangre como tetrámeros. Lo que nos sorprendió un poco es que la
+hemoglobina zeta (HBZ) aparezca con una identidad tan similar a la de CYGB (28.19\%). HBZ es una
+hemoglobina embrionaria muy antigua y divergente, con diferencias tan grandes respecto a las otras Hb
+que termina pareciéndose a la Mb casi tanto como la citoglobina.
+
+\textbf{iv) ¿Creen que encontraron todas las proteínas de la familia de las globinas que existen en el
+genoma humano?}
+
+No. Con BLASTp y RefSeq Select solo aparecieron 3 proteínas. Sabemos que faltan al menos la neuroglobina
+(NGB), las hemoglobinas alfa (HBA1), beta (HBB), delta (HBD), épsilon (HBE1), gamma-1 (HBG1),
+gamma-2 (HBG2), mu (HBM) y theta-1 (HBQ1). Algunas de estas probablemente quedan por debajo del umbral
+de E-value con los parámetros por defecto dado lo baja que es su identidad con la Mb.
+
+\textbf{v) Intente encontrar la mayor cantidad de globinas modificando los parámetros. ¿Qué parámetros
+modificaron y qué proteínas nuevas encontraron?}
+
+Con PSI-BLAST (ver punto vi) recuperamos prácticamente todas las globinas sin tocar los parámetros de
+scoring. Si quisiéramos hacerlo con BLASTp simple, los cambios que probaríamos son: aumentar el E-value
+threshold a 10 para no perder hits distantes, cambiar la matriz a BLOSUM45 (más adecuada para secuencias
+con $\sim$45\% de identidad como estas globinas) y reducir el word size a 2 para que BLAST encuentre más
+palabras semilla en secuencias divergentes.
+
+\textbf{vi) PSI-BLAST: ¿encontraron alguna proteína nueva? ¿Cuántas iteraciones hicieron?}
+
+Hicimos \textbf{2 iteraciones} de PSI-BLAST con la Mb humana como query contra RefSeq Select en
+\textit{Homo sapiens}.
+
+\medskip
+\noindent\textbf{Iteración 1} --- 9 secuencias con $E < 0.005$:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.4cm}P{1.8cm}c}
+\toprule
+Proteína & E-value & Identidad & Nueva respecto a BLASTp \\
+\midrule
+myoglobin isoform 1              & $1 \times 10^{-111}$ & 100\%   & no \\
+cytoglobin (CYGB)                & $5 \times 10^{-17}$  & 28.67\% & no \\
+hemoglobin subunit zeta (HBZ)    & $1 \times 10^{-16}$  & 28.19\% & no \\
+hemoglobin subunit theta-1 (HBQ1)& $5 \times 10^{-10}$  & 25.00\% & sí \\
+hemoglobin subunit gamma-2 (HBG2)& $5 \times 10^{-10}$  & 25.55\% & sí \\
+hemoglobin subunit gamma-1 (HBG1)& $7 \times 10^{-10}$  & 25.55\% & sí \\
+hemoglobin subunit alpha (HBA1)  & $6 \times 10^{-9}$   & 27.52\% & sí \\
+hemoglobin subunit epsilon (HBE1)& $4 \times 10^{-8}$   & 24.09\% & sí \\
+hemoglobin subunit mu (HBM)      & $7 \times 10^{-8}$   & 27.61\% & sí \\
+\bottomrule
+\end{tabular}
+\caption{PSI-BLAST iteración 1: globinas humanas encontradas.}
+\end{table}
+
+Ya en la primera iteración aparecieron 6 globinas nuevas que BLASTp no había encontrado.
+
+\medskip
+\noindent\textbf{Iteración 2} --- 12 secuencias en total, 3 nuevas:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.4cm}P{1.8cm}}
+\toprule
+Proteína nueva & E-value & Identidad \\
+\midrule
+hemoglobin subunit delta (HBD) & $6 \times 10^{-57}$ & 25.52\% \\
+hemoglobin subunit beta (HBB)  & $9 \times 10^{-56}$ & 24.83\% \\
+neuroglobin (NGB)              & $6 \times 10^{-14}$ & 17.76\% \\
+\bottomrule
+\end{tabular}
+\caption{PSI-BLAST iteración 2: proteínas nuevas respecto a la iteración 1.}
+\end{table}
+
+El hallazgo más interesante es la \textbf{neuroglobina (NGB)} en la segunda iteración, con solo 17.76\%
+de identidad respecto a la Mb. BLASTp nunca la hubiera encontrado con esos parámetros porque esa identidad
+es demasiado baja para que el hit sea estadísticamente significativo usando BLOSUM62. PSI-BLAST pudo
+recuperarla porque después de la primera iteración construye una \textbf{PSSM}
+(\textit{Position-Specific Scoring Matrix}) con todas las globinas encontradas. La PSSM asigna un puntaje
+diferente a cada aminoácido en cada posición de la secuencia según cuánto está conservada esa posición en
+la familia --- es mucho más informativa que una matriz genérica como BLOSUM para detectar homólogos lejanos.

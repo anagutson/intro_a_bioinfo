@@ -1,0 +1,11 @@
+proteina_N315	enterotoxina(s)	decision	mejor_identidad (%)	mejor_cob_query (%)	mejor_cob_hit (%)	mejor_evalue
+lcl|NC_002745.2_prot_WP_000034846.1_1893	sep	unica	99.615	100.0	99.62	0.0
+lcl|NC_002745.2_prot_WP_000278088.1_1957	sec3;sec2;sec1	multiple	100.0	100.0	99.63	0.0
+lcl|NC_002745.2_prot_WP_000475325.1_371	selx	unica	96.059	100.0	99.51	8.59e-146
+lcl|NC_002745.2_prot_WP_000713847.1_1761	sei	unica	100.0	100.0	99.59	1.52e-180
+lcl|NC_002745.2_prot_WP_000736712.1_1758	seg	unica	100.0	100.0	99.61	0.0
+lcl|NC_002745.2_prot_WP_000746599.1_1956	sel	unica	99.167	100.0	99.59	2.31e-176
+lcl|NC_002745.2_prot_WP_000821658.1_1762	sem;selv	multiple	92.469	100.0	99.58	6.0000000000000004e-167
+lcl|NC_002745.2_prot_WP_001035599.1_1959	tsst-1	unica	99.145	100.0	99.57	3.63e-174
+lcl|NC_002745.2_prot_WP_001236362.1_1759	sen	unica	100.0	100.0	96.91	0.0
+lcl|NC_002745.2_prot_WP_010922839.1_1763	seo	unica	99.615	100.0	99.24	0.0

@@ -1,0 +1,28 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {chapter}{\numberline {1}Objetivo 1: Dominios en Conserved Domains (NCBI)}{3}{}%
+\contentsline {section}{\numberline {1.1}Ejercicio 1a}{3}{}%
+\contentsline {section}{\numberline {1.2}Ejercicio 1b}{4}{}%
+\contentsline {section}{\numberline {1.3}Ejercicio 1c}{4}{}%
+\contentsline {chapter}{\numberline {2}Objetivo 2: InterPro y Pfam}{6}{}%
+\contentsline {section}{\numberline {2.1}Ejercicio 2a}{6}{}%
+\contentsline {section}{\numberline {2.2}Ejercicio 2b}{7}{}%
+\contentsline {section}{\numberline {2.3}Ejercicio 2c}{7}{}%
+\contentsline {section}{\numberline {2.4}Ejercicio 2d}{8}{}%
+\contentsline {section}{\numberline {2.5}Ejercicio 2e}{9}{}%
+\contentsline {section}{\numberline {2.6}Ejercicio 2f}{9}{}%
+\contentsline {section}{\numberline {2.7}Ejercicio 2g}{9}{}%
+\contentsline {section}{\numberline {2.8}Ejercicio 2h}{10}{}%
+\contentsline {section}{\numberline {2.9}Ejercicio 2i}{11}{}%
+\contentsline {chapter}{\numberline {3}Objetivo 3: PROSITE y patrones}{12}{}%
+\contentsline {section}{\numberline {3.1}Ejercicio 3a}{12}{}%
+\contentsline {section}{\numberline {3.2}Ejercicio 3b}{12}{}%
+\contentsline {section}{\numberline {3.3}Ejercicio 3c}{13}{}%
+\contentsline {section}{\numberline {3.4}Ejercicio 3d}{14}{}%
+\contentsline {chapter}{\numberline {4}Objetivo 4: De humanos a bacterias y viceversa}{15}{}%
+\contentsline {section}{\numberline {4.1}Ejercicio 4a --- Búsqueda de homólogos humanos por distintos métodos}{15}{}%
+\contentsline {subsection}{\numberline {4.1.1}a) BLAST}{15}{}%
+\contentsline {subsection}{\numberline {4.1.2}b) PSI-BLAST}{15}{}%
+\contentsline {subsection}{\numberline {4.1.3}c) Pfam / InterPro}{16}{}%
+\contentsline {subsection}{\numberline {4.1.4}d) PROSITE}{16}{}%
+\contentsline {subsection}{\numberline {4.1.5}Comparación de métodos}{16}{}%
+\contentsline {section}{\numberline {4.2}Ejercicio 4b --- Función propuesta y experimento}{17}{}%

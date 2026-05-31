@@ -1,0 +1,111 @@
+\documentclass[12pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm]{geometry}
+\usepackage{parskip}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage{dirtytalk}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{array,booktabs}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{setspace}
+\setstretch{1.4}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  backgroundcolor=\color{gray!8},
+  commentstyle=\color{gray}\itshape,
+  keywordstyle=\color{blue!70!black},
+  stringstyle=\color{olive},
+  showstringspaces=false,
+  captionpos=b,
+}
+
+\newcolumntype{P}[1]{@{}>{\centering\arraybackslash}p{#1}@{}}
+\renewcommand{\arraystretch}{1.3}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\LARGE}
+
+\titlespacing*{\chapter}{0pt}{0pt}{10pt}
+\titlespacing*{\section}{0pt}{12pt}{4pt}
+\titlespacing*{\subsection}{0pt}{8pt}{2pt}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\newenvironment{consigna}{%
+  \begin{quote}\itshape\small\color{gray!60!black}%
+}{%
+  \end{quote}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+
+\vspace*{0.8cm}
+
+\IfFileExists{partes/Logo_exactas.pdf}{%
+  \includegraphics[width=0.42\textwidth]{partes/Logo_exactas.pdf}%
+}{%
+  {\Large Facultad de Ciencias Exactas y Naturales\par}%
+}
+
+\vspace{0.6cm}
+
+{\Large\scshape Introducción a la Bioinformática Molecular\par}
+
+\vspace{1.2cm}
+
+\rule{\textwidth}{0.4pt}
+
+\vspace{0.55cm}
+
+{\LARGE\bfseries Trabajo Práctico 3\par}
+\vspace{0.25cm}
+{\Large\bfseries Bases de datos secundarias\par}
+
+\vspace{0.55cm}
+
+\rule{\textwidth}{0.4pt}
+
+\vspace{1.2cm}
+
+\begin{tabular}{@{}ll@{}}
+Romero, Alexmary   & 95501187 \\
+Gutson, Ana Gabriela & 43445314
+\end{tabular}
+
+\vfill
+
+{\large 25 de mayo de 2026\par}
+
+\end{titlepage}
+
+\tableofcontents
+
+\chapter{Objetivo 1: Dominios en Conserved Domains (NCBI)}
+\input{partes/objetivo1}
+
+\chapter{Objetivo 2: InterPro y Pfam}
+\input{partes/objetivo2}
+
+\chapter{Objetivo 3: PROSITE y patrones}
+\input{partes/objetivo3}
+
+\chapter{Objetivo 4: De humanos a bacterias y viceversa}
+\input{partes/objetivo4}
+
+\end{document}

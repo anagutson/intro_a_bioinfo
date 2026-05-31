@@ -1,0 +1,180 @@
+% ============================================================
+%  Objetivo 3 — PROSITE y patrones
+% ============================================================
+
+% ============================================================
+\section{Ejercicio 3a}
+
+\begin{consigna}
+¿Qué tipo de signature es PS50111? ¿A qué dominio corresponde?
+\end{consigna}
+
+PS50111 es un \textbf{perfil} (\textit{profile}), es decir una matriz de pesos posición-específica
+que captura cuánto varía cada posición del dominio --- no un patrón de expresiones regulares. Los
+perfiles son más sensibles que los patrones porque modelan variabilidad posición a posición en lugar
+de buscar residuos fijos.
+
+El resultado de ScanProsite encontró \textbf{1 hit}:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{2.5cm}P{5cm}}
+\toprule
+Signature & Posiciones & Score & Dominio predicho \\
+\midrule
+PS50111 & 331--588 & 29.836 & ``Methyl-accepting transducer'' (MCPsignal) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+PS50111 corresponde al dominio \textbf{MCPsignal}, no al HNOB. Las posiciones 331--588 coinciden
+exactamente con el dominio C-terminal de señalización de quimiotaxis. Algo a notar: el dominio
+HNOB (posiciones 1--190) \textbf{no fue detectado} por PROSITE. Pfam e InterPro sí lo detectaron,
+pero PROSITE no tiene un perfil de HNOB que alcance el umbral para esta secuencia. Esto muestra
+que distintas bases de datos pueden cubrir distintos dominios, y que usar una sola herramienta
+no siempre es suficiente.
+
+% ============================================================
+\section{Ejercicio 3b}
+
+\begin{consigna}
+Construya a mano un patrón a partir del logo del HMM. Búsquelo en PROSITE y describa qué tipo
+de proteínas encuentra.
+\end{consigna}
+
+Construimos el patrón a partir de las tres posiciones más conservadas del HMM de HNOB (His
+proximal --- pos.\,103, Pro --- pos.\,116, Tyr --- pos.\,132):
+
+\begin{center}
+\ttfamily H-x(11,13)-P-x(14,16)-Y
+\end{center}
+
+Al buscarlo en Swiss-Prot obtuvimos \textbf{más de 10.000 hits} (el servidor alcanzó el límite).
+El número esperado de matches al azar es $\sim$14.021 en 100.000 secuencias, lo que indica que el
+patrón es prácticamente no específico.
+
+Entre los resultados aparecen proteínas completamente no relacionadas: virus de insectos (IIV-3,
+Frog virus), proteínas de cerdo africano (ASFV), lectinas, glucosidasas, enzimas de reparación de
+ADN de docenas de organismos distintos. No encontramos ninguna ``methyl-accepting chemotaxis
+protein'' ni proteína de unión a NO entre los primeros resultados.
+
+El problema es que el patrón tiene solo 3 posiciones fijas (H, P, Y) separadas por ventanas muy
+largas ($\sim$30 residuos cada una), lo que permite demasiados matches al azar. Esto ilustra bien
+la diferencia entre un patrón manual y un perfil HMM: el perfil usa la información de todas las
+posiciones del alineamiento en simultáneo, no solo 3 residuos ancla.
+
+% ============================================================
+\section{Ejercicio 3c}
+
+\begin{consigna}
+Corra PRATT con el alineamiento seed de HNOB. Compare los patrones antes y después del
+refinamiento. ¿Puede localizar el patrón en el logo del HMM?
+\end{consigna}
+
+Para correr PRATT necesitamos el alineamiento seed de HNOB en formato FASTA. Descargamos el
+seed desde Pfam en formato Stockholm y lo convertimos con el script
+\texttt{scripts/stockholm\_to\_fasta.py}:
+
+\begin{lstlisting}[language=bash]
+python scripts/stockholm_to_fasta.py data/HNOB_seed.sto resultados/HNOB_seed.fasta
+\end{lstlisting}
+
+El seed original tenía 121 secuencias, pero PRATT acepta como máximo 100, así que tomamos
+las primeras 100 y las guardamos en \texttt{resultados/HNOB\_seed\_100.fasta}. Corrimos PRATT
+con Min Percentage = 70 y Pattern Refinement = ON.
+
+\textbf{Antes del refinamiento}, los patrones con mayor fitness son muy cortos y con
+posiciones degeneradas:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{5.5cm}P{2cm}P{2cm}}
+\toprule
+Patrón & Fitness & Secuencias \\
+\midrule
+\texttt{Y-x-S-x-R}        & 12.5102 & 93 \\
+\texttt{Y-x-S-x(1,2)-R}   & 12.0102 & 93 \\
+\texttt{F-x(4,5)-D-x(1,2)-H} & 11.5102 & 76 \\
+\bottomrule
+\end{tabular}
+\caption{Patrones de PRATT antes del refinamiento (Top 3 por fitness).}
+\end{table}
+
+El patrón más frecuente antes del refinamiento (\texttt{Y-x-S-x-R}) captura 93 de las 100
+secuencias pero tiene solo 3 posiciones fijas separadas por wildcards de longitud fija, lo
+que en la práctica es bastante inespecífico.
+
+\textbf{Después del refinamiento}, los patrones mejoran su fitness y se vuelven más informativos:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{1cm}P{5.5cm}P{2cm}P{2cm}}
+\toprule
+ID & Patrón & Fitness & Secuencias \\
+\midrule
+A1 & \texttt{L-x(1,3)-Y-x-[GST]-x-R}          & 14.1163 & 72 \\
+B2 & \texttt{F-x(4,5)-D-x(1,2)-H-x(2)-[ILMV]} & 13.9048 & 70 \\
+C3 & \texttt{F-x(4,5)-D-x(0,2)-H-x(2)-[ILMV]} & 13.4048 & 70 \\
+D4 & \texttt{Y-x-S-x-R}                         & 12.5102 & 93 \\
+\bottomrule
+\end{tabular}
+\caption{Patrones de PRATT después del refinamiento (Top 4 por fitness).}
+\end{table}
+
+El patrón \textbf{B2} (\texttt{F-x(4,5)-D-x(1,2)-H-x(2)-[ILMV]}) es el biológicamente más
+interesante: termina en una H que corresponde exactamente a la histidina proximal del hemo
+(posición 103 del HMM). En la Proteína X de \textit{C. tetani} el match es
+\texttt{FfnslfDi-HvvM} en las posiciones 93--104 de la secuencia, justo alrededor del
+residuo His que identificamos como el más conservado del dominio.
+
+Localizando en el logo del HMM: la F del inicio del patrón B2 corresponde a residuos
+hidrofóbicos conservados alrededor de la posición 96, la D aparece como una posición
+moderadamente conservada en esa región, y la H final es la columna más alta del logo en
+posición 103. El refinamiento logró capturar exactamente el bloque funcional del sitio de
+unión al hemo.
+
+% ============================================================
+\section{Ejercicio 3d}
+
+\begin{consigna}
+Busque el patrón de PRATT en PROSITE. ¿Qué tipo de proteínas encuentra? Compare con el patrón
+manual.
+\end{consigna}
+
+Buscamos el patrón B2 de PRATT (\texttt{F-x(4,5)-D-x(1,2)-H-x(2)-[ILMV]}) en ScanProsite
+contra Swiss-Prot (574.627 entradas, release 2026\_01). El resultado alcanzó el límite de
+10.000 secuencias con \textbf{10.181 hits en total}. Los primeros resultados incluyen proteínas
+completamente no relacionadas con HNOB: transportadores ABC de \textit{Arabidopsis}, lectinas
+de arroz (Ricin B-like lectins), oxidasas de hongos, toxinas dérmicas de arañas
+(\textit{Loxosceles}), proteínas de virus de insectos (FV-3, ASFV), y receptores de adenosina
+humanos, entre otras. No encontramos ninguna ``methyl-accepting chemotaxis protein'' ni proteína
+de unión a hemo entre los primeros resultados.
+
+El número esperado de matches al azar es $\sim$2.059 por cada 100.000 secuencias, lo que
+es consistente con obtener $\sim$10.000 hits en las 574.627 entradas de Swiss-Prot. Es decir,
+prácticamente todos los hits son falsos positivos generados al azar.
+
+Al comparar los tres enfoques:
+
+\begin{itemize}
+  \item El \textbf{patrón manual} (\texttt{H-x(11,13)-P-x(14,16)-Y}) también llegó al límite
+        de 10.000 hits con proteínas no relacionadas. El problema ahí eran las ventanas de
+        $\sim$30 residuos que permiten demasiada variabilidad.
+
+  \item El \textbf{patrón de PRATT refinado} (\texttt{F-x(4,5)-D-x(1,2)-H-x(2)-[ILMV]}) tiene
+        ventanas más cortas y un bloque más contiguo, pero igualmente llega a 10.000 hits. Las
+        tres posiciones fijas (F, D, H) separadas por 4--5 y 1--2 wildcards son insuficientes
+        para discriminar un dominio específico en una base de datos de 574.000 secuencias.
+\end{itemize}
+
+Lo que aprendemos de este ejercicio es que ni el patrón manual ni el de PRATT son suficientemente
+específicos solos para identificar el dominio HNOB. La diferencia real con el perfil HMM de Pfam
+(que sí detecta correctamente el dominio) es que el perfil usa \textbf{todas las posiciones del
+alineamiento simultáneamente}, no solo 3 o 4 residuos ancla. Cuando una proteína tiene que cumplir
+la distribución de aminoácidos en 180 posiciones al mismo tiempo, los falsos positivos se eliminan.
+Los patrones de PROSITE son útiles para sitios activos muy conservados (como el PROSITE de la
+serina proteasa: \texttt{[LIVM]-[ST]-A-[STAG]-H-C}), pero para dominios enteros el HMM gana
+siempre.

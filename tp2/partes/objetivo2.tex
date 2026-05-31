@@ -1,0 +1,158 @@
+% ============================================================
+%  Ejercicio 2.1 — drrA, map2k7 y ndk contra VFDB
+% ============================================================
+\section{Ejercicio 2.1}
+
+\begin{consigna}
+Repita la búsqueda con \texttt{-outfmt 6} y visualice las columnas. Investigue cómo incluir el
+alineamiento. Repita para las otras 2 proteínas. ¿Qué puede concluir del análisis?
+\end{consigna}
+
+El comando básico con outfmt 6:
+
+\begin{lstlisting}[language=bash]
+blastp -query drrA.faa -db VFDB_setB_pro.fas -evalue 1e-5 -outfmt 6
+\end{lstlisting}
+
+Las 12 columnas del formato tabular por defecto son:
+
+\begin{center}
+\small\ttfamily
+qseqid\ \ sseqid\ \ pident\ \ length\ \ mismatch\ \ gapopen\ \ qstart\ \ qend\ \ sstart\ \ send\ \ evalue\ \ bitscore
+\end{center}
+
+Para incluir las secuencias alineadas hay que agregar \texttt{qseq} y \texttt{sseq} al final del string de
+outfmt:
+
+\begin{lstlisting}[language=bash]
+blastp -query drrA.faa -db VFDB_setB_pro.fas -evalue 1e-5 \
+  -outfmt "6 qseqid sseqid pident length mismatch gapopen \
+           qstart qend sstart send evalue bitscore qseq sseq"
+\end{lstlisting}
+
+Resultados para las tres proteínas:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{1.8cm}P{2.2cm}}
+\toprule
+Query & Mejor hit en VFDB & Identidad (\%) & E-value \\
+\midrule
+drrA   & VFG018236 --- drrA/sidM, \textit{Legionella pneumophila} Ph-1  & 100.0 & 0.0 \\
+map2k7 & VFG019987 --- ppkA, \textit{Pseudomonas aeruginosa} LESB58     & 30.2  & $1.6 \times 10^{-18}$ \\
+ndk    & VFG031478 --- ndk, \textit{Mycobacterium marinum} M             & 58.8  & $3.2 \times 10^{-52}$ \\
+\bottomrule
+\end{tabular}
+\caption{Mejor hit en VFDB para cada proteína query (blastp, $E < 10^{-5}$).}
+\end{table}
+
+\textbf{drrA} tiene un match exacto (100\% de identidad) con un factor de virulencia de VFDB: es la misma
+proteína, anotada en VFDB como factor de virulencia de \textit{Legionella pneumophila}. \textbf{ndk} tiene
+un hit fuerte (58.8\%, E-value $3.2 \times 10^{-52}$) contra NDK de \textit{Mycobacterium marinum}, que
+está anotada como factor de virulencia porque bloquea la maduración del fagosoma; el resultado es
+biológicamente coherente. \textbf{map2k7} es el caso más interesante: tiene hits significativos, pero con
+solo 30\% de identidad y cubriendo únicamente una región parcial de la proteína (el dominio quinasa).
+map2k7 es una quinasa eucariota de la vía de estrés JNK; la similitud refleja conservación del dominio
+catalítico quinasa, que está presente en muchas proteínas de organismos muy distintos. No sería correcto
+anotarla como factor de virulencia solo por este resultado: el BLAST detecta similitud de dominio, no
+equivalencia funcional.
+
+% ============================================================
+%  Ejercicio 2.2 — N315 vs VFDB con Bio.SearchIO
+% ============================================================
+\section{Ejercicio 2.2}
+
+\begin{consigna}
+Buscar todos los factores de virulencia de VFDB sobre el proteoma de \textit{S.\ aureus} N315.
+Generar una tabla con: query, hit, cobertura de la query, cobertura del hit, identidad y especie del hit.
+\end{consigna}
+
+Corrimos BLAST del proteoma completo de N315 contra VFDB con el siguiente comando (incluimos \texttt{qlen}
+y \texttt{slen} para poder calcular las coberturas en el script):
+
+\begin{lstlisting}[language=bash]
+blastp -query staph_aureus_N315_proteome.faa -db VFDB_setB_pro.fas \
+  -evalue 1e-5 -num_threads 4 -max_target_seqs 10 \
+  -outfmt "6 qseqid sseqid pident length mismatch gapopen \
+           qstart qend sstart send evalue bitscore qlen slen \
+           qseq sseq stitle" \
+  -out N315_vs_VFDB_blast.tsv
+\end{lstlisting}
+
+Para analizar la salida usamos \texttt{Bio.SearchIO} de Biopython
+(\texttt{scripts/ejercicio\_2\_2\_biopython.py}):
+
+\begin{lstlisting}[language=Python]
+import Bio.SearchIO as bpio
+
+campos = ["qseqid","sseqid","pident","length","mismatch","gapopen",
+          "qstart","qend","sstart","send","evalue","bitscore",
+          "qlen","slen","stitle"]
+
+resultados = list(bpio.parse("N315_vs_VFDB_blast.tsv",
+                              "blast-tab", fields=campos))
+
+for query_result in resultados:
+    for hit in query_result:
+        for hsp in hit:
+            cob_query = (hsp.query_end - hsp.query_start) * 100 \
+                        / query_result.seq_len
+            cob_hit   = (hsp.hit_end - hsp.hit_start) * 100 \
+                        / hit.seq_len
+            especie = hit.description  # extraído de stitle
+            # filtrar por cobertura del hit >= 70% y armar la tabla
+\end{lstlisting}
+
+Con el criterio de cobertura del hit $\geq 70\%$ identificamos \textbf{503 proteínas} del proteoma de N315
+con similitud significativa a factores de virulencia de VFDB. La tabla completa está en
+\texttt{resultados/N315\_vs\_VFDB\_biopython.tsv} con columnas: query, hit, cobertura\_query (\%),
+cobertura\_hit (\%), identidad (\%), evalue, bitscore, especie\_hit.
+
+% ============================================================
+%  Ejercicio 2.3 — Enterotoxinas en N315
+% ============================================================
+\section{Ejercicio 2.3}
+
+\begin{consigna}
+\textbf{a)} BLAST del proteoma de N315 contra la base de enterotoxinas. ¿Cuáles están presentes? \\
+\textbf{b)} Programar un criterio de decisión por identidad/cobertura. Si más de un hit cumple las
+expectativas, indicar que se encontró más de una.
+\end{consigna}
+
+Usamos el siguiente criterio de decisión: identidad $\geq 80\%$, cobertura de la query $\geq 80\%$ y
+cobertura del hit $\geq 80\%$. El script (\texttt{scripts/ejercicio\_2\_3\_biopython.py}) lee la salida
+tabular, aplica estos tres filtros y para cada proteína query lista las enterotoxinas que los pasan. Si
+más de una enterotoxina cumple para la misma proteína, la decisión queda como \texttt{multiple}.
+
+\medskip
+Enterotoxinas detectadas en el proteoma de \textit{S.\ aureus} N315:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{1.5cm}P{1.8cm}P{2.2cm}}
+\toprule
+Proteína N315   & Enterotoxina(s)  & Decisión & Identidad (\%) & E-value \\
+\midrule
+WP\_000034846.1 & sep              & única    & 99.6  & $\sim 0$ \\
+WP\_000278088.1 & sec3; sec2; sec1 & multiple & 100.0 & $\sim 0$ \\
+WP\_000475325.1 & selx             & única    & 96.1  & $8.6 \times 10^{-146}$ \\
+WP\_000713847.1 & sei              & única    & 100.0 & $1.5 \times 10^{-180}$ \\
+WP\_000736712.1 & seg              & única    & 100.0 & $\sim 0$ \\
+WP\_000746599.1 & sel              & única    & 99.2  & $2.3 \times 10^{-176}$ \\
+WP\_000821658.1 & sem; selv        & multiple & 92.5  & $6.0 \times 10^{-167}$ \\
+WP\_001035599.1 & tsst-1           & única    & 99.1  & $3.6 \times 10^{-174}$ \\
+WP\_001236362.1 & sen              & única    & 100.0 & $\sim 0$ \\
+WP\_010922839.1 & seo              & única    & 99.6  & $\sim 0$ \\
+\bottomrule
+\end{tabular}
+\caption{Enterotoxinas estafilocócicas detectadas en \textit{S.\ aureus} N315
+(criterio: identidad $\geq 80\%$, coberturas $\geq 80\%$).}
+\end{table}
+
+Encontramos 10 enterotoxinas en total. Los dos casos \texttt{multiple} tienen una explicación biológica
+clara: sec1, sec2 y sec3 son variantes muy parecidas de la enterotoxina estafilocócica tipo C, con
+secuencias tan similares entre sí que con nuestro criterio de 80\% de identidad no es posible
+distinguirlas; lo mismo pasa con sem y selv. En esos casos preferimos reportar \texttt{multiple} en lugar
+de elegir una al azar, ya que forzar una clasificación única sería incorrecto.

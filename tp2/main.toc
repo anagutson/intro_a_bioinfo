@@ -1,0 +1,10 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {chapter}{\numberline {1}Objetivo 1: Uso de BLAST en NCBI-web}{2}{}%
+\contentsline {section}{\numberline {1.1}Objetivo 1.1 — Comparación de 2 secuencias}{2}{}%
+\contentsline {subsection}{\numberline {1.1.1}Ejercicio 1.1}{3}{}%
+\contentsline {section}{\numberline {1.2}Objetivo 1.2 — Búsqueda de proteínas homólogas a la Mb en humanos}{5}{}%
+\contentsline {subsection}{\numberline {1.2.1}Ejercicio 1.2}{5}{}%
+\contentsline {chapter}{\numberline {2}Objetivo 2: Uso de BLAST en línea de comando}{9}{}%
+\contentsline {section}{\numberline {2.1}Ejercicio 2.1}{9}{}%
+\contentsline {section}{\numberline {2.2}Ejercicio 2.2}{10}{}%
+\contentsline {section}{\numberline {2.3}Ejercicio 2.3}{11}{}%

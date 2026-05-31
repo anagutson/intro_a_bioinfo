@@ -1,0 +1,283 @@
+% ============================================================
+%  Objetivo 2 — InterPro y Pfam
+% ============================================================
+
+% ============================================================
+\section{Ejercicio 2a}
+
+\begin{consigna}
+En la solapa Overview de InterPro: ¿qué dominios se encontraron? ¿En qué bases de datos?
+¿Son los mismos que los reportados por NCBI-CDD?
+\end{consigna}
+
+InterPro encontró \textbf{5 entries} para la Proteína X:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{llP{4.2cm}P{2.8cm}}
+\toprule
+Accession & Short name & Nombre completo & Región \\
+\midrule
+IPR004090 & Chemotax\_Me-accpt\_rcpt & Chemotaxis methyl-accepting receptor     & C-terminal (familia) \\
+IPR004089 & MCPsignal\_dom           & MCP signalling domain                    & $\sim$270--617 aa \\
+IPR038158 & H-NOX\_domain\_sf        & H-NOX domain superfamily                 & $\sim$1--190 aa \\
+IPR024096 & NO\_sig/Golgi\_transp    & NO signalling/Golgi transport ligand-bd  & $\sim$1--190 aa \\
+IPR011644 & Heme\_NO-bd              & Heme NO-binding                          & $\sim$1--190 aa \\
+\bottomrule
+\end{tabular}
+\caption{Entries de InterPro encontradas para la Proteína X.}
+\end{table}
+
+Son los \textbf{mismos dos dominios} que reportó NCBI-CDD (HNOB + MCPsignal/Tar), pero
+InterPro los desglosa en más entradas porque integra distintos niveles de clasificación: familia
+específica, superfamilia estructural y superfamilia funcional. Las tres entries del N-terminal
+(IPR011644, IPR038158 e IPR024096) describen el mismo dominio de unión a hemo desde ángulos
+distintos.
+
+Las bases de datos miembro que contribuyeron matches:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{2.5cm}P{5.5cm}}
+\toprule
+Base de datos & Matches & Dominio detectado \\
+\midrule
+\textbf{Pfam}             & 2 & HNOB (PF07730) + MCPsignal (PF00672) \\
+\textbf{SUPERFAMILY}      & 2 & H-NOX superfamily + NO signalling superfamily \\
+\textbf{CATH-Gene3D}      & 2 & Clasificaciones estructurales de ambos dominios \\
+\textbf{SMART}            & 1 & MCPsignal \\
+\textbf{PANTHER}          & 1 & Familia MCP general \\
+\textbf{PROSITE profiles} & 1 & Perfil PS50111 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La diferencia principal con NCBI-CDD es que InterPro agrega información funcional extra (términos
+GO como \textit{heme binding} y \textit{chemotaxis}) e integra 7 bases de datos distintas, mientras
+que CDD muestra directamente los 2 dominios. Pfam y SMART son las fuentes comunes a ambas.
+
+% ============================================================
+\section{Ejercicio 2b}
+
+\begin{consigna}
+Teniendo en cuenta la función del dominio HNOB, ¿qué aminoácido espera que esté muy conservado?
+\end{consigna}
+
+El dominio HNOB une un grupo hemo para detectar NO con afinidad femtomolar. En todas las
+hemoproteínas conocidas, el hierro del hemo está coordinado axialmente por una \textbf{histidina
+proximal} que actúa como ligando directo del hierro. Esta histidina es absolutamente indispensable:
+si se muta, el hemo no se une y la proteína pierde completamente su función de sensor. La propia
+descripción de Pfam para PF07730 lo dice explícitamente: \textit{``binds heme via a covalent linkage
+to histidine''}. Esperamos entonces que la \textbf{histidina (H)} sea el residuo más conservado en
+el alineamiento del dominio.
+
+% ============================================================
+\section{Ejercicio 2c}
+
+\begin{consigna}
+¿Encuentra el aminoácido muy conservado del punto 2b?
+\end{consigna}
+
+Sí. En el alineamiento seed de HNOB la histidina aparece prácticamente invariante en la
+\textbf{posición 103} del modelo HMM. Su score de emisión en esa posición es \textbf{0.266},
+que es el valor más bajo para His en todo el modelo --- los demás aminoácidos tienen scores de
+entre 3.0 y 6.1 en la misma posición, es decir que tienen probabilidades muchísimo más bajas.
+Esto confirma que la posición está prácticamente restringida a histidina, consistente con su
+rol como ligando axial del hemo.
+
+% ============================================================
+\section{Ejercicio 2d}
+
+\begin{consigna}
+Elija del alineamiento 3 columnas muy conservadas, 2 poco conservadas y 2 posiciones con
+gaps/inserciones, y justifique.
+\end{consigna}
+
+Tomamos los datos directamente del archivo del modelo HMM (PF07700).
+
+\textbf{3 columnas muy conservadas} (score de emisión bajo $\Rightarrow$ alta probabilidad en esa posición):
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{2.5cm}P{2cm}P{2.5cm}P{6cm}}
+\toprule
+Posición HMM & AA & Score & Justificación \\
+\midrule
+132 & \textbf{Y} (Tyr) & 0.136 & Residuo aromático del núcleo hidrofóbico del dominio \\
+116 & \textbf{P} (Pro) & 0.154 & Introduce un quiebre estructural en el loop que rodea el hemo \\
+103 & \textbf{H} (His) & 0.266 & Histidina proximal; ligando axial del hierro del hemo \\
+\bottomrule
+\end{tabular}
+\caption{Posiciones más conservadas en el alineamiento seed de HNOB.}
+\end{table}
+
+\textbf{2 columnas poco conservadas} (score mínimo alto $\Rightarrow$ ningún aminoácido domina):
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{2.5cm}P{2cm}P{2.5cm}P{6cm}}
+\toprule
+Posición HMM & Mejor AA & Score & Justificación \\
+\midrule
+71 & F & 2.375 & Posición de superficie; tolera muchos aminoácidos distintos \\
+40 & T & 2.300 & Loop variable sin restricciones funcionales fuertes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{2 posiciones con mayor probabilidad de inserción} (score de transición m$\to$i bajo):
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{2.5cm}P{2.5cm}P{7.5cm}}
+\toprule
+Posición HMM & Score m$\to$i & Justificación \\
+\midrule
+31  & 0.816 & Loop entre elementos de estructura secundaria; longitud variable entre organismos \\
+103 & 0.887 & Zona alrededor del sitio de unión al hemo; los loops en esa región son variables \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Ejercicio 2e}
+
+\begin{consigna}
+¿Coincide la apreciación del alineamiento múltiple con el logo del HMM?
+\end{consigna}
+
+Sí, el logo del HMM es completamente consistente con lo que observamos en el alineamiento:
+
+La \textbf{posición 103} aparece en el logo con una columna H (His) muy alta, alcanzando
+$\sim$4.0 bits de contenido de información --- la más alta de esa región. La probabilidad de His
+en esa posición es 0.766 (76.6\%), seguida por Y = 0.050 y F = 0.036, o sea que His es
+ampliamente dominante. La ocupancia es 0.995, lo que significa que casi todas las secuencias
+del seed tienen un residuo en esa posición (no un gap). Esto coincide exactamente con la His
+casi invariante del alineamiento.
+
+Las posiciones poco conservadas del alineamiento aparecen en el logo como columnas bajas con
+mezcla de colores, lo que refleja que muchos aminoácidos son igualmente posibles. Y las filas
+\textit{ins.prob} del logo muestran barras naranjas en las posiciones 31 y 103, confirmando
+la mayor probabilidad de inserción en esas zonas.
+
+% ============================================================
+\section{Ejercicio 2f}
+
+\begin{consigna}
+¿Qué número de posición tiene la His del punto 2b?
+\end{consigna}
+
+La histidina proximal del hemo está en la \textbf{posición 103} del modelo HMM de HNOB (PF07700).
+
+% ============================================================
+\section{Ejercicio 2g}
+
+\begin{consigna}
+¿Qué valores de emisión tiene esa posición para los distintos aminoácidos? ¿Es lo que esperaba?
+\end{consigna}
+
+En HMMER los valores de emisión son log-odds negativos: un valor \textbf{bajo} significa alta
+probabilidad (ese aminoácido es frecuente en esa posición), y un valor \textbf{alto} significa
+baja probabilidad.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{1.5cm}P{2cm}P{1.5cm}P{2cm}}
+\toprule
+AA & Score & AA & Score \\
+\midrule
+\textbf{H} & \textbf{0.266} $\leftarrow$ & P & 5.418 \\
+Y & 3.004 & M & 5.498 \\
+F & 3.324 & W & 4.955 \\
+K & 4.223 & I & 5.010 \\
+L & 4.245 & G & 4.901 \\
+R & 4.386 & T & 4.875 \\
+E & 4.503 & V & 4.838 \\
+A & 4.582 & N & 4.699 \\
+S & 4.577 & Q & 4.720 \\
+D & 4.637 & C & 6.092 \\
+\bottomrule
+\end{tabular}
+\caption{Valores de emisión del HMM para la posición 103 (His proximal del hemo).}
+\end{table}
+
+Es exactamente lo que esperábamos: His tiene el score más bajo de toda la fila (0.266) y todos
+los demás aminoácidos tienen valores de 3.0 para arriba, con Cys en el extremo opuesto (6.092).
+La diferencia es muy grande, lo que confirma que esta posición está prácticamente restringida a
+histidina. Tiene sentido biológicamente: sin esa His el hemo no se une y la proteína pierde su
+función completamente, así que cualquier mutación en esa posición sería letal para la función del
+sensor.
+
+% ============================================================
+\section{Ejercicio 2h}
+
+\begin{consigna}
+¿Con qué otros dominios se puede combinar HNOB según las arquitecturas de Pfam?
+\end{consigna}
+
+Pfam reporta 134 arquitecturas distintas para HNOB. Las más frecuentes son:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{P{1.5cm}P{5cm}P{5cm}}
+\toprule
+Proteínas & Arquitectura & Función \\
+\midrule
+5189 & HNOB --- HNOBA --- Guanilato/adenilato ciclasa & Guanilato ciclasa soluble (sGC) de animales \\
+2848 & HNOB (solo)                                     & Sensor de NO bacteriano sin efector acoplado \\
+374  & HNOB --- MCPsignal                              & Receptor de quimiotaxis (\textbf{nuestra proteína}) \\
+357  & HNOB --- HNOBA                                  & Con dominio asociado \\
+\bottomrule
+\end{tabular}
+\caption{Arquitecturas de dominio más frecuentes en proteínas con dominio HNOB.}
+\end{table}
+
+Lo interesante es que la Proteína X de \textit{C. tetani} pertenece a una arquitectura minoritaria
+(374 proteínas) comparada con la sGC de animales que tiene 5189. La diferencia en el efector es
+clave: en bacterias el dominio HNOB se combina con MCPsignal para hacer quimiotaxis, mientras
+que en animales se combina con HNOBA y una ciclasa para producir cGMP como segundo mensajero.
+Mismo dominio sensor, distinto efector según el reino.
+
+% ============================================================
+\section{Ejercicio 2i}
+
+\begin{consigna}
+¿Cuántas especies de \textit{Clostridium} tienen el dominio HNOB según Pfam? ¿Cuáles son las
+más representadas?
+\end{consigna}
+
+En la sección de taxonomía de Pfam para HNOB (PF07700), encontramos \textbf{118 taxa} de
+\textit{Clostridium} con al menos una proteína con este dominio. Las más representadas:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{3cm}}
+\toprule
+Especie & Proteínas con HNOB \\
+\midrule
+\textit{Clostridium botulinum}      & 22 \\
+\textit{Clostridium beijerinckii}   & 10 \\
+\textit{Clostridium sporogenes}     &  5 \\
+\textit{Clostridium estertheticum}  &  4 \\
+\textit{Clostridium tetani}         &  \textbf{4} \\
+\textit{Clostridium intestinale}    &  3 \\
+\textit{Clostridium kluyveri}       &  3 \\
+\textit{Clostridium cochlearium}    &  3 \\
+\textit{Clostridium perfringens}    &  1 \\
+\bottomrule
+\end{tabular}
+\caption{Especies de \textit{Clostridium} con dominio HNOB según Pfam (extracto).}
+\end{table}
+
+\textit{C. tetani} tiene 4 proteínas con dominio HNOB, incluyendo la Proteína X que estamos
+estudiando. \textit{C. botulinum} es el más representado con 22 proteínas, posiblemente porque
+tiene más genomas secuenciados. El dominio está presente en prácticamente todo el género, lo
+que sugiere que es una función ancestral en \textit{Clostridium}.
