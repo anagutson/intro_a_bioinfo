@@ -2,26 +2,35 @@
 
 ---
 
-# ÍNDICE RÁPIDO
+# ÍNDICE POR CLASE
 
-1. [Marco conceptual y estructura del parcial](#1-marco-conceptual)
-2. [Alineamiento por pares: NW / SW](#2-alineamiento-nw-sw)
-3. [BLAST y PSI-BLAST](#3-blast)
-4. [MSA — CLUSTALW y SP score](#4-msa)
-5. [Bases de datos primarias](#5-bases-de-datos-primarias)
-6. [Bases de datos secundarias — HMM, PROSITE, InterPro](#6-bases-de-datos-secundarias)
-7. [Matrices de sustitución — PAM vs BLOSUM](#7-matrices-pam-blosum)
-8. [Aminoácidos](#8-aminoacidos)
-9. [NGS, Ensamblado, Genómica Humana](#9-ngs)
-10. [Resolución del Parcial 2018](#10-parcial-2018)
+- [Clase 1 — Marco Conceptual y Bases de Datos Primarias](#clase-1)
+- [Clase 2 — Alineamiento, Matrices y Aminoácidos](#clase-2)
+- [Clase 3 — BLAST y Alineamiento Múltiple](#clase-3)
+- [Clase 4 — Bases de Datos Secundarias](#clase-4)
+- [Clase 5 — NGS y Ensamblado de Genomas](#clase-5)
+- [Clase 6 — Genómica Humana y Medicina Personalizada](#clase-6)
+- [Parcial 2018 — Resolución](#parcial-2018)
 
 ---
 
-## 1. Marco Conceptual
+## Clase 1 — Marco Conceptual y Bases de Datos Primarias
 
-La bioinformática existe en la intersección entre biología y ciencias de la computación. Antes de entrar a los algoritmos, conviene entender cómo se organizan los niveles de abstracción de la disciplina y qué tipo de preguntas se hacen en el parcial.
+### Qué es la bioinformática y por qué importa la pregunta biológica
 
-### Jerarquía: Teoría → Algoritmo → Programa
+En clase el profe arrancó con una advertencia: la bioinformática no es un fin en sí mismo. El error que ve todo el tiempo es el de alguien que dice "quiero hacer bioinformática" sin tener ni idea de cuál es su pregunta biológica. Eso conduce a la frustración pura: uno empieza a probar páginas web, programas, bases de datos, y no llega a ningún lado. La pregunta biológica es la zanahoria adelante del burro. Sin ella, todo lo demás no tiene sentido.
+
+La bioinformática en sentido amplio es el uso de la tecnología de la información para gestionar y analizar datos biológicos. En el sentido más práctico de esta materia: el uso de programas y algoritmos aplicados a estudios biológicos. Tiene tres aspectos: (1) desarrollo de teoría hacia algoritmos (codificar la biología en pasos lógico-matemáticos), (2) aplicación de esos algoritmos a datos para generar predicciones, (3) organización de los datos para que los algoritmos puedan correr.
+
+### Jerarquía: Teoría → Algoritmo → Programa → Dato
+
+**La teoría** es una idea, un modelo de cómo funciona un fenómeno biológico. La teoría celular, las leyes de Mendel, el dogma central, son teorías. No son informática todavía: están en papel, en libros, en la cabeza de los investigadores.
+
+**El algoritmo** es el paso bisagra: cuando uno toma esa teoría y la traduce en una serie de pasos lógico-matemáticos con reglas específicas. Dado un input, producen un output. El algoritmo es la informatización de la teoría. Es independiente del lenguaje de programación: puede estar escrito en papel.
+
+El ejemplo del profe para que se entienda la diferencia entre teoría y algoritmo fue **la división**. Todos saben dividir conceptualmente (6 caramelos para 3 amigos = 2 cada uno). Pero si decís: dividí 12.432.324 por 752, nadie lo puede hacer a mano de manera rápida. Sin embargo, todos aprendieron en la primaria el **algoritmo** de dividir: tomá la primera cifra, buscala en la tabla del divisor, anotá el cociente, restá, bajá la siguiente cifra, repetí. El algoritmo transforma el problema imposible en pasos simples. El dato son las tablas de multiplicar. El programa sería implementar eso en Python.
+
+Otro ejemplo: **Mendel**. Mendel observó plantas y anotó los resultados (datos). De las observaciones formuló una teoría (alelos, dominante/recesivo, segregación). De la teoría bajó a un algoritmo: si cruzás dos heterocigotas, las frecuencias son 1:2:1. La bioinformática aparece cuando la cantidad de datos se vuelve tan grande que no se puede hacer a mano.
 
 | Nivel | Definición | Ejemplo |
 |-------|-----------|---------|
@@ -31,6 +40,33 @@ La bioinformática existe en la intersección entre biología y ciencias de la c
 | **Dato** | Lo medido experimentalmente; input del algoritmo | Secuencia FASTA |
 
 > En el parcial se puede responder con el nombre del **algoritmo** O con el nombre del **programa** — ambas respuestas son equivalentes. "Haría un alineamiento de pares" = "usaría NW/SW" = "usaría BLAST".
+
+**Observación importante del profe sobre eficiencia:** la eficiencia no importa cuando se diseña el algoritmo, importa cuando se implementa el programa. Si dos alternativas algorítmicas son del mismo orden de magnitud, siempre conviene la más clara. La eficiencia importa cuando la diferencia es de órdenes de magnitud (O(n²) vs O(n·log n) vs O(n)).
+
+### Por qué el ADN es el origen de toda la bioinformática
+
+Watson y Crick terminaron su paper con la frase: "it has not escaped our notice that with specific pairing we have postulated a possible copying mechanism for the genetic material". Con eso describían el mecanismo de replicación. Pero lo más profundo es que la secuencia lineal del ADN es una forma de contener información. El ADN es un lenguaje de cuatro letras, igual que el lenguaje humano es un lenguaje de 26 letras. Y la bioinformática es, en el fondo, el manejo de esa información.
+
+La analogía del profe: descifrar el ADN es como los arqueólogos intentando entender los jeroglíficos antes de la Piedra Roseta. La secuencia está ahí, pero no se sabe qué significa. Los biólogos fueron descubriendo el código genético usando secuencias que sabían lo que codificaban como tabla de equivalencias.
+
+La relación genotipo-fenotipo no es como un plano y un avión (bijección: si cambio el plano, cambio el avión). Es como una receta y una torta. Si tenés dos tortas que saben distinto, no podés saber de inmediato qué cambió en la receta. La bioinformática codifica los algoritmos que relacionan genotipo y fenotipo.
+
+### Ortólogos y parálogos
+
+La homología tiene dos sabores:
+
+- **Ortólogos**: genes homólogos en distintas especies que derivan del mismo gen ancestral por **especiación**. El gen de la hemoglobina alfa en humano y en ratón son ortólogos. Tienden a conservar la misma función. Son los más confiables para inferir función por homología.
+- **Parálogos**: genes homólogos dentro de la misma especie que derivan de una **duplicación génica**. La hemoglobina alfa y la beta en humano son parálogas. Pueden tener funciones similares pero diferenciadas. Menos confiables para inferir función directamente.
+
+### Principio de "culpa por asociación"
+
+"Guilt by association" es el fundamento detrás de prácticamente toda búsqueda en bases de datos biológicas. Si una secuencia desconocida se parece mucho a un grupo de secuencias con función conocida, se infiere que tiene la misma función, **sin necesidad de experimentar directamente**.
+
+¿Por qué funciona? Por la homología. Si dos genes tienen secuencias muy similares, la explicación más parsimoniosa es que descienden de un ancestro común. Y si descienden de un ancestro común, lo más probable es que hayan heredado también su función.
+
+**Ejemplo:** si tengo una proteína nueva y búsqueda en BD muestra que su secuencia se parece mucho a kinasas conocidas, puedo predecir que también es una kinasa. Eso ahorra años de experimentos. No es certeza absoluta pero es una hipótesis sólida.
+
+El profe lo ilustró a nivel de aminoácido individual: si querés hacer una mutante con presupuesto para solo dos mutaciones, ¿cuál elegís? Buscás los aminoácidos subrepresentados (cisteínas, triptofanos, histidinas) y los mutás primero. Están subrepresentados precisamente porque la evolución los conservó con mayor presión selectiva: cuando aparecen, suelen estar en el sitio activo.
 
 ### Estructura típica del parcial
 
@@ -49,317 +85,62 @@ La bioinformática existe en la intersección entre biología y ciencias de la c
 - Cuando veas un logo, fijarse si las letras son aminoácidos (A/R/N...) o nucleótidos (A/T/G/C). ¡Son distintos!
 - Simple answer = correct answer. No complicar de más.
 
-### Principio de "culpa por asociación"
-
-Si una secuencia desconocida se parece mucho a un grupo de genes conocidos, se predice que tiene la misma función **sin necesidad de experimentar directamente**. Es el principio fundamental detrás de las búsquedas en BD.
-
 ---
 
-## 2. Alineamiento NW / SW
 
-### Introducción: el problema de comparar dos secuencias
+### Por qué existen: historia y necesidad real
 
-Dos secuencias homólogas (con un ancestro común) suelen diferir porque a lo largo de la evolución se acumulan sustituciones, inserciones y deleciones. Para detectar esa homología hay que **alinear** las secuencias: colocarlas una sobre la otra de manera que las posiciones equivalentes queden en la misma columna, introduciendo guiones (gaps) donde hubo inserciones/deleciones.
+La historia de las bases de datos biológicas no empieza con internet. El profe la contó así:
 
-El problema de encontrar el **mejor alineamiento posible** se resuelve con programación dinámica. La idea clave es que el alineamiento óptimo de dos prefijos de longitud i y j puede calcularse a partir del alineamiento óptimo de prefijos más cortos → se construye la solución celda a celda en una matriz.
+Todo empieza con las **proteínas**. Sanger (una de las tres personas en toda la historia en recibir dos premios Nobel por dos descubrimientos distintos, junto con Marie Curie y Linus Pauling) primero desarrolló el método para secuenciar proteínas y décadas más tarde para secuenciar ADN. En la década de 1960 ya se conocían varias proteínas y alguien juntó toda esa información en el "Atlas of Protein Sequence and Structure": un registro por proteína con todo lo que se sabía. Primero era un libro. En 1972 ese libro fue pasado a cinta magnética.
 
-Existen dos variantes del mismo principio según qué pregunta se quiere responder:
-- **NW** (Needleman-Wunsch, 1970): alineamiento **global** — fuerza a alinear las secuencias de punta a punta. Útil cuando las dos secuencias son similares en largo y función.
-- **SW** (Smith-Waterman, 1981): alineamiento **local** — encuentra la región de mayor similitud. Útil cuando las secuencias son divergentes o tienen dominios distintos.
+En la década de 1980 Amos Bairoch digitalizó ese Atlas y creó **Swiss-Prot**. Lo distribuyó a través de la red universitaria precursora de internet. Ese fue el puntapié inicial de la bioinformática moderna: una base de datos digital de proteínas, accesible remotamente.
 
-### Comparación rápida
+Al mismo tiempo, con el método de Sanger para secuenciar ADN volviéndose masivo, había que guardar las secuencias. En 1988, el NCBI de EE.UU. creó GenBank, el EMBL europeo creó su BD de nucleótidos (hoy ENA), y Japón creó el DDBJ. Ese mismo año los tres formaron el **INSDC** (International Nucleotide Sequence Database Collaboration): un consorcio donde los tres se sincronizan diariamente y mantienen el mismo formato. Si depositás en cualquiera de los tres, en 24 horas aparece en los otros dos.
 
-| | **Needleman-Wunsch** | **Smith-Waterman** |
-|--|--|--|
-| Tipo | **Global** (toda la secuencia) | **Local** (mejor región) |
-| Cuándo usar | Secuencias similares en longitud | Dominios en secuencias divergentes |
-| Diferencia en recurrencia | — | **+ opción 0** (evita scores negativos) |
-| Inicio traceback | Celda (n, m) — esquina inferior derecha | Celda con **valor máximo** de toda la matriz |
-| Fin traceback | Celda (0, 0) | Celda con **valor 0** |
-| Complejidad | O(nm) tiempo y espacio | O(nm) tiempo y espacio |
-
-### Inicialización
-
-```
-NW:  F(i, 0) = i · gap_penalty   (para todo i)
-     F(0, j) = j · gap_penalty   (para todo j)
-     F(0, 0) = 0
-
-SW:  F(i, 0) = 0   y   F(0, j) = 0   (siempre)
-     F(0, 0) = 0
-```
-
-### Recurrencia NW
-
-```
-F(i,j) = max {
-    F(i-1, j-1) + s(xᵢ, yⱼ)    ← diagonal (match/mismatch)
-    F(i-1, j)   + gap            ← arriba    (gap en Y)
-    F(i, j-1)   + gap            ← izquierda (gap en X)
-}
-```
-
-### Recurrencia SW (idéntica + opción 0)
-
-```
-F(i,j) = max {
-    0                             ← NUNCA baja de cero
-    F(i-1, j-1) + s(xᵢ, yⱼ)
-    F(i-1, j)   + gap
-    F(i, j-1)   + gap
-}
-```
-
-### Gap lineal vs gap affine
-
-```
-Gap lineal:   W_k = gap · k
-Gap affine:   W_k = a + b·k      (a = costo apertura, b = costo extensión)
-Biológico: a >> b — abrir es caro, extender es barato
-```
-
-Con gap affine: venir desde la izquierda (misma fila) = extender gap (costo b). Venir desde la diagonal = abrir gap nuevo (costo a).
-
-### Múltiples alineamientos óptimos
-
-Ocurren cuando **dos opciones de la recurrencia dan el mismo valor** en alguna celda del traceback. Hay que enumerar todos los caminos posibles — todos tienen el mismo score final.
-
-Para encontrarlos:
-1. Llenar la matriz de scores normalmente.
-2. Al hacer traceback, en cada celda empate → bifurcar el camino.
-3. Cada camino completo desde esquina a esquina = un alineamiento óptimo distinto.
-
-### Cómo leer el alineamiento desde el traceback
-
-| Movimiento | Significado |
-|-----------|-------------|
-| ↖ diagonal | match o mismatch entre xᵢ e yⱼ |
-| ↑ arriba | gap en la secuencia horizontal (Y) |
-| ← izquierda | gap en la secuencia vertical (X) |
-
----
-
-## 3. BLAST
-
-### Introducción: el problema de escala
-
-NW/SW encuentran el alineamiento óptimo entre dos secuencias. Pero si quiero saber si mi proteína nueva tiene homólogos en una base de datos con millones de secuencias, aplicar SW a cada par es computacionalmente inviable. Se necesita un método que sea rápido a escala de base de datos completa, aunque sacrifique el óptimo garantizado. Esa es la razón de ser de BLAST: una **heurística** que usa una estrategia de "sembrar y extender" para lograr velocidad O(m) en la práctica, donde m es el largo de la query.
-
-### Por qué existe BLAST
-
-NW/SW son O(nm). Buscar una proteína de 200 aa contra 1M de proteínas = 2×10¹¹ operaciones → **inviable**. BLAST es una **heurística** que sacrifica el óptimo garantizado por velocidad, logrando O(m) en la práctica.
-
-**Idea:** primero buscar "semillas" exactas cortas (words) que probablemente estén en el alineamiento óptimo, y solo desde ahí extender.
-
-### Los 4 pasos del algoritmo BLAST
-
-#### Paso 1 — Word list
-
-Para una query de largo m y word size w=3, se extraen m−w+1 words solapadas:
-```
-Query: A L V G T T Y H H V D R R
-Words: ALV, LVG, VGT, GTT, ...   (11 words para m=13)
-```
-
-Para cada word, se buscan **todas las palabras vecinas** de largo w con score BLOSUM62 ≥ T (default T=11):
-```
-Vecinas de "ALV": ALV, ALL, AVL, ... (unas ~50 para w=3, T=11)
-```
-→ Resultado: **word list** con ~50×(m−2) entradas.
-
-> Efecto del umbral T: T↑ → lista más corta → más rápido, menos sensible.  
-> Efecto de w: w↑ → más rápido, menos sensible.
-
-#### Paso 2 — Búsqueda de hits exactos
-
-La BD está **pre-indexada**: tabla que, para cada word, lista todas las posiciones de todas las secuencias donde aparece **exactamente**.
-
-BLAST busca cada word de la word list en ese índice → **hit exacto** = par (posición en query, posición en secuencia BD).
-
-> Innovación clave: la estructura de datos permite búsqueda en **O(1)** → total O(m) en lugar de O(nm).
-
-#### Paso 3 — Extensión sin gaps (ungapped extension)
-
-Desde cada hit, se extiende en ambas direcciones sumando scores BLOSUM62, **sin gaps**.
-
-```
-         ← izq  |  hit  |  der →
-query:   L  V  [A  L  V]  G  T
-BD seq:  L  V  [A  L  L]  G  T
-                ↑ extiende acumulando score
-```
-
-Se detiene cuando el score cae demasiado. Resultado: **HSP** (High-Scoring Segment Pair). Solo se guardan HSPs con score ≥ umbral S.
-
-#### Paso 4 — Extensión con gaps (gapped extension)
-
-Solo para los HSPs que superaron el umbral, se hace alineamiento local con gaps (tipo SW) centrado en el HSP. Se calcula el **E-value** y se filtra.
-
-### E-value — qué es y cómo interpretarlo
-
-```
-E = K · m · N · e^(−λS)
-
-  m = largo de la query
-  N = tamaño total de la BD (número de residuos)
-  S = score del HSP
-  K, λ = parámetros estadísticos (dependen de la matriz y gaps)
-```
-
-**Significado:** número esperado de hits con score ≥ S que aparecerían **por azar** en una BD de ese tamaño. No es una probabilidad, es un conteo esperado.
-
-```
-E = 1e-10  →  casi imposible por azar  → hit muy significativo
-E = 0.01   →  1 hit cada 100 búsquedas al azar → aceptable
-E = 1      →  1 hit por azar en esta búsqueda  → dudoso
-E = 100    →  100 hits por azar                → ruido
-```
-
-> E-value depende de N (tamaño de BD) → el mismo score da distinto E-value en distintas búsquedas. Por eso se reporta E-value y no solo el score raw.
->
-> A mayor score → **menor** E-value → más significativo.
-
-### Tipos de BLAST
-
-| Programa | Query | BD | Cuándo usarlo |
-|----------|-------|----|---------------|
-| **blastp** | proteína | proteínas | buscar homólogos de una proteína |
-| **blastn** | nucleótidos | nucleótidos | buscar homólogos de un gen |
-| **blastx** | nucl → 6 marcos | proteínas | gen nuevo, buscar proteínas homólogas |
-| **tblastn** | proteína | nucl → 6 marcos | proteína conocida, buscar en genoma no anotado |
-| **tblastx** | nucl 6 marcos | nucl 6 marcos | comparar genomas no anotados (muy costoso) |
-
-> Sensibilidad para detectar homólogos remotos: **blastp > blastx > tblastn**.
-
-### PSI-BLAST — BLAST iterativo
-
-**Problema que resuelve:** BLAST usa BLOSUM62 genérica. PSI-BLAST aprende que ciertas posiciones de la familia son muy conservadas y las trata distinto.
-
-```
-Ronda 1:
-  query → BLAST normal (BLOSUM62) → hits con E < umbral
-
-Construcción de PSSM:
-  MSA de los hits → para cada posición i, para cada aa a:
-    PSSM[i][a] = log( frecuencia observada / frecuencia esperada al azar )
-  → Posiciones muy conservadas: score alto para el aa correcto, muy negativo para otros
-  → Posiciones variables: scores similares para muchos aa
-
-Ronda 2:
-  query → buscar en BD con PSSM[i][a] (en lugar de BLOSUM62)
-  → Detecta homólogos remotos que ronda 1 perdió
-
-Repetir hasta convergencia
-```
-
-> **Peligro:** si un falso positivo entra al MSA, contamina la PSSM y en la siguiente ronda aparecen más FP → "PSI-BLAST drift". Umbral típico para incluir en MSA: E < 0.001.
-
-### Complejidad comparada
-
-| Método | Complejidad | Tipo | Sensibilidad |
-|--------|-------------|------|--------------|
-| NW / SW | **O(nm)** | Exacto | Máxima |
-| BLAST | **O(m)** | Heurístico | Alta |
-| PSI-BLAST | **O(m) × iter** | Heurístico iterativo | Muy alta |
-| HMMer | O(m × L) | Probabilístico | Máxima para familia |
-
----
-
-## 4. MSA — CLUSTALW y SP score
-
-### Introducción: ¿por qué alinear múltiples secuencias?
-
-Un alineamiento de pares (NW/SW) compara dos secuencias. Pero para entender una **familia de proteínas** — detectar qué posiciones están conservadas evolutivamente, qué residuos son funcionalmente críticos, o construir un árbol filogenético — necesito alinear simultáneamente decenas o cientos de secuencias. Eso es un **MSA** (Multiple Sequence Alignment).
-
-El problema: el MSA óptimo por programación dinámica tiene complejidad O(Lᴺ) siendo N el número de secuencias → intratable para N > 3. Se necesita una heurística. La más usada es el enfoque **progresivo**: en lugar de alinear todo junto, primero alinear los pares más parecidos y luego ir agregando los más distantes, guiándose por un árbol de similitud.
-
-**CLUSTALW** es el algoritmo estándar de MSA progresivo. Su salida (el MSA) es la entrada para construir perfiles HMM (§6), calcular distancias evolutivas y definir árboles filogenéticos.
-
-### CLUSTALW: algoritmo de MSA progresivo
-
-```
-Paso 1: Alinear todos los pares (pairwise) → scores → matriz de distancias N×N
-Paso 2: Construir árbol guía (Neighbor-Joining) desde la matriz de distancias
-Paso 3: Alinear progresivamente siguiendo el árbol
-        → primero los más similares (rama más corta del árbol)
-        → luego agregar los más distantes
-        → los gaps introducidos en pasos previos se preservan
-```
-
-**Limitación clave:** errores de pasos tempranos se propagan y **NO se corrigen** en pasos posteriores.
-
-### Árbol guía
-
-- El par con **mayor score de alineamiento** (más similares → menor distancia) se une **primero**.
-- Si hay 3 secuencias y S(1,3) > S(2,3) > S(1,2): el árbol une primero 1 y 3, luego agrega 2.
-
-```
-Ejemplo árbol con Prot1, Prot2, Prot3 (S13=23, S23=4, S12=1):
-
-        ┌── Prot1
-   ┌────┤           ← primeros en unirse (mayor score)
-   │    └── Prot3
-───┤
-   └──────── Prot2  ← se agrega después (score menor)
-```
-
-### SP score (Sum of Pairs)
-
-El SP score es la suma de los scores de **todos los pares posibles** del MSA.
-
-```
-SP = Σ S(seqᵢ, seqⱼ)   para todo i < j
-```
-
-Para 3 secuencias: SP = S(1,2) + S(1,3) + S(2,3)
-
-**Cálculo por columna:**
-
-Para cada columna del MSA, sumar los scores entre todos los pares de caracteres en esa columna. Luego sumar todas las columnas.
-
-**Regla gap-gap = 0:** cuando dos gaps quedan alineados en la misma columna, su contribución al SP es 0 (no penaliza). Un gap alineado con un residuo sí penaliza.
-
-**Ejemplo con 3 secuencias, scoring match=1, mismatch=0, gap-char=−1, gap-gap=0:**
-```
-Seq1: A  C  -  T
-Seq2: A  C  G  T
-Seq3: A  T  G  T
-
-col 1 (A,A,A): 1+1+1 = 3
-col 2 (C,C,T): 1+0+0 = 1
-col 3 (-,G,G): −1+−1+1 = −1   ← gap con residuo penaliza; dos residuos iguales suman
-col 4 (T,T,T): 1+1+1 = 3
-SP = 6
-```
-
-### Relación SP score ↔ árbol guía
-
-Con 3 secuencias, SP_total = S(1,2) + S(1,3) + S(2,3), independientemente del orden en que se construyó el MSA.
-
-Con 4 secuencias agrupadas como (1&2) vs (3&4):
-```
-SP_total = S(1,2) + S(3,4) + S(1,3) + S(1,4) + S(2,3) + S(2,4)
-```
-
----
-
-## 5. Bases de Datos Primarias
-
-### Introducción: ¿por qué existen bases de datos biológicas?
-
-Cada vez que se secuencia un gen, se resuelve una estructura proteica o se hace un experimento de expresión génica, se genera información que tiene valor más allá del laboratorio que la produjo. Las **bases de datos biológicas** centralizan esos datos para que cualquier investigador pueda aplicar el principio de "culpa por asociación": si mi secuencia nueva se parece a una secuencia con función conocida, puedo inferir su función sin necesidad de experimentar desde cero.
-
-No todas las bases de datos son iguales. Difieren en tres dimensiones clave que determinan cuándo conviene usarlas: **curación** (¿quién controla la calidad?), **redundancia** (¿aparece la misma secuencia varias veces?) y **origen de los datos** (¿datos crudos experimentales o resultado de análisis bioinformático?). Entender esas dimensiones es exactamente lo que se pregunta en el Problema 2 del parcial.
+Al principio todo era simple. Pero con el tiempo la cantidad de datos creció explosivamente y vinieron los problemas que justifican el diseño actual: información duplicada, errores, miles de entradas para el mismo gen.
 
 ### Criterios de clasificación
 
 | Dimensión | Opciones | Definición |
 |-----------|----------|-----------|
-| **Curación** | Curada vs No curada | Curada = revisión manual por expertos. No curada = el autor deposita sin revisión. |
+| **Curación** | Curada vs No curada | Curada = revisión manual por expertos antes de aceptar el registro. No curada = el autor deposita sin revisión sistemática. |
 | **Redundancia** | Redundante vs No redundante | Redundante = el mismo dato puede aparecer en múltiples registros. |
 | **Origen** | Primaria vs Secundaria | Primaria = datos experimentales crudos. Secundaria = resultado del análisis bioinformático de datos primarios. |
 
-> **Regla:** para clasificar una BD, responder las 3 preguntas. Se puede ser curada y primaria (RefSeq), o no curada y primaria (GenBank), o curada y secundaria (SGD).
+> **Regla:** para clasificar una BD, responder las 3 preguntas. Se puede ser curada y primaria (RefSeq, Swiss-Prot), no curada y primaria (GenBank, TrEMBL), o curada y secundaria (SGD, PFAM, KEGG).
+
+### El problema de la redundancia: por qué un mismo gen puede tener 50 entradas en GenBank y 1 en RefSeq
+
+El profe lo explicó con un ejemplo concreto: el Dr. K secuenció el gen de la fibronectina en 1985 y lo subió a GenBank. Diez años después, el Dr. L secuencia el mismo gen de la misma especie y también lo sube. ¿Y si difieren en una base? ¿Es una mutación, un polimorfismo, un error de secuenciación?
+
+GenBank toma la decisión de repositorio: cada autor sube lo que quiere y es responsable del contenido. Por eso, si buscás el gen de la insulina humana en GenBank, podés encontrar 50, 100, 200 entradas.
+
+Esta situación se volvió inmanejable con la secuenciación masiva. Entonces se creó **RefSeq** (Reference Sequence Database). RefSeq no es un repositorio: es una BD curada, donde para cada organismo modelo, un equipo establece cuál es la secuencia de referencia de cada molécula. El criterio: **una molécula física = un registro**.
+
+Si el gen de la insulina humana tiene tres variantes de splicing, RefSeq tiene tres registros (NM_xxxxxx.1, NM_xxxxxx.2, NM_xxxxxx.3), uno por cada ARNm. En cambio, GenBank puede tener miles de entradas del mismo gen.
+
+La analogía del profe: **GenBank es como un paper** (el autor presenta sus datos, pasa una revisión mínima de formato, y se publica sin que nadie verifique la biología). **RefSeq es como un review** (un experto revisa toda la literatura, consensúa, y publica la secuencia de referencia).
+
+### Curada vs no curada: qué pasa concretamente cuando hay un error
+
+**Definición del profe:** BD curada = entre el autor que genera el dato y el sistema que lo guarda, hay un proceso de revisión que verifica si ese dato es correcto. No curada (repositorio) = el autor sube directamente y nadie revisa.
+
+**En un repositorio** como GenBank: un lab sube una secuencia con un error de secuenciación (un artefacto, una base incorrecta). Esa secuencia queda indefinidamente. Si alguien la usa para un alineamiento, puede llegar a conclusiones incorrectas. Históricamente hubo casos de genes reportados como "nuevos" que eran artefactos de secuenciación o contaminaciones.
+
+**En una BD curada** como Swiss-Prot: antes de que una entrada entre, un curador humano revisa la secuencia, la contrasta con la literatura, verifica la anotación funcional, y solo entonces la acepta. Eso hace que Swiss-Prot tenga muchas menos entradas que TrEMBL, pero cada entrada vale más en términos de confiabilidad.
+
+La situación práctica: si estás trabajando con un organismo nuevo o poco estudiado, es probable que no esté en las BDs curadas. Tenés que ir al repositorio y asumís que los datos tienen ruido. Si estás trabajando con un organismo modelo (humano, ratón, Drosophila, levadura), hay BDs curadas específicas donde la calidad es mucho mayor.
+
+### Primaria vs secundaria: el principio más importante para el parcial
+
+**BD primaria**: almacena el dato crudo obtenido directamente de experimentos. La secuencia de un gen (medida con un secuenciador), la estructura de una proteína (resuelta por cristalografía o cryo-EM), el perfil de expresión génica (medido por RNA-seq). El dato viene de un experimento de laboratorio o de una observación directa. GenBank, RefSeq, PDB, Swiss-Prot, TrEMBL, GEO: todas son primarias.
+
+**BD secundaria**: almacena el resultado del análisis bioinformático de datos primarios. No hay nuevo experimento de laboratorio: hay análisis computacional. Las BDs de familias de proteínas (PFAM, PROSITE) se construyen tomando miles de secuencias de BDs primarias, alineándolas, detectando patrones conservados, y agrupándolas en familias. Eso es bioinformática aplicada a datos primarios.
+
+Otros ejemplos de secundarias: SGD (integra GenBank + UniProt + literatura para levadura), FlyBase (lo mismo para Drosophila), KEGG (integra genomas y los mapea a pathways metabólicos), Ensembl (anota genomas de vertebrados integrando datos de múltiples fuentes).
+
+La diferencia práctica: si querés la secuencia de un gen, vas a una BD primaria. Si querés saber a qué familia pertenece tu proteína o a qué pathway está asociada, vas a una BD secundaria.
 
 ### Bases de nucleótidos
 
@@ -371,16 +152,29 @@ No todas las bases de datos son iguales. Difieren en tres dimensiones clave que 
 | **RefSeq** | Curada | No redundante | Primaria | 1 registro por molécula por organismo; NCBI lo mantiene |
 | **Ensembl** | Curada | No redundante | Secundaria | Browser genómico; anotación de vertebrados |
 
-> GenBank es análogo = **paper**; RefSeq es análogo = **review**.
+> GenBank = **paper**; RefSeq = **review**. Ambas primarias, pero RefSeq curada.
 
 **Prefijos RefSeq:**
 | Prefijo | Contenido |
 |---------|-----------|
-| NM | mRNA verificado experimentalmente |
-| NP | Proteína verificada experimentalmente |
-| XM | mRNA predicho in silico |
-| XP | Proteína predicha in silico |
-| NT | DNA genómico de contigs |
+| NM\_ | ARNm verificado experimentalmente |
+| NP\_ | Proteína verificada experimentalmente |
+| XM\_ | ARNm predicho in silico |
+| XP\_ | Proteína predicha in silico |
+| NT\_ | contig genómico |
+| NC\_ | cromosoma completo |
+
+Si en el parcial ves un accession que empieza con NM\_ o NP\_, es RefSeq verificado. XM\_ o XP\_ es RefSeq pero predicción computacional.
+
+### Swiss-Prot vs TrEMBL: calidad vs cobertura
+
+**Swiss-Prot** es la BD de proteínas curada manualmente. Cada entrada tiene nombre del gen, función anotada, dominios, sitios activos, modificaciones post-traduccionales, variantes conocidas, todo verificado por un curador humano que leyó la literatura. El criterio de redundancia: "una proteína funcional = un registro". Todas las isoformas de una misma proteína (por splicing alternativo) van en el mismo registro, con una secuencia canónica y las variantes anotadas.
+
+**TrEMBL** (Translated EMBL) es la traducción automática de todos los registros codificantes de GenBank y EMBL. No hay curación manual. Es enormemente grande (cientos de millones de entradas) pero con muchos errores: anotaciones incorrectas, proteínas hipotéticas, artefactos de secuenciación traducidos.
+
+**UniProtKB** es la unión de Swiss-Prot y TrEMBL bajo una misma interfaz. Cuando buscás en UniProt, podés filtrar por "Swiss-Prot" (curada) o "TrEMBL" (no curada).
+
+**Distinción de criterio de redundancia**: **RefSeq organiza por molécula física** (un ARNm = un registro, aunque sea una isoforma del mismo gen). **UniProt/Swiss-Prot organiza por unidad funcional** (un gen/proteína = un registro, con todas las isoformas anotadas dentro). Para un gen con 20 isoformas, RefSeq tiene 20 registros de ARNm y 20 registros de proteína; Swiss-Prot tiene 1 registro de proteína con las 20 isoformas anotadas.
 
 ### Bases de proteínas
 
@@ -392,47 +186,1226 @@ No todas las bases de datos son iguales. Difieren en tres dimensiones clave que 
 | **GenPept** | No curada | Redundante | Primaria | Traducción automática del INSDC (NCBI) |
 | **PDB** | Curada | Redundante | Primaria | Estructuras 3D; misma proteína puede tener cientos de estructuras |
 
-> Swiss-Prot ≠ TrEMBL: Swiss-Prot curada manual → confiable. TrEMBL automática → enorme pero con más errores.
->
-> UniProt organiza por **unidad funcional** (gen) → todas las isoformas en 1 registro. RefSeq organiza por **molécula** → cada isoforma de mRNA = 1 registro separado.
+### PDB: por qué hay 300 estructuras de la misma proteína
 
-### Bases de expresión génica
+La **Protein Data Bank (PDB)** almacena estructuras tridimensionales de macromoléculas biológicas. Es primaria (datos de experimentos), curada (hay revisión antes de depositar), y redundante (múltiples estructuras por proteína).
 
-| BD | Curación | Redundancia | Tipo | Notas |
-|----|----------|-------------|------|-------|
-| **GEO** | No curada | Redundante | Primaria | Repositorio NCBI de microarrays y RNA-seq |
-| **ArrayExpress** | No curada | Redundante | Primaria | Equivalente europeo (EBI) |
-| **GTEx** | Curada | No redundante | Secundaria | Expresión por tejido en humanos sanos |
+¿Por qué redundante? Para la misma proteína puede haber cientos de estructuras depositadas porque:
+- La misma proteína resuelta en distintas condiciones (pH diferente, temperatura diferente).
+- La proteína con distintos ligandos: apo (sin ligando), con sustrato, con inhibidor, con cofactor.
+- La proteína con distintas mutaciones puntuales para estudiar el efecto de cada mutación.
+- La proteína en distintos contextos de cristalización que dan resoluciones distintas.
+- Distintos laboratorios que resuelven la misma proteína de manera independiente.
 
-### Bases de variantes genéticas
+Cada estructura tiene un identificador de 4 caracteres alfanuméricos (ej: 1HHO es una estructura de hemoglobina). Para el parcial: si te preguntan sobre una BD de estructuras, la respuesta es PDB. Es primaria, curada, y redundante.
 
-| BD | Curación | Redundancia | Notas |
-|----|----------|-------------|-------|
-| **dbSNP** | No curada | Redundante | Repositorio de todos los SNPs; IDs `rs` |
-| **ClinVar** | Curada | No redundante | Variantes con significado clínico (Patogénica/VUS/Benigna) |
-| **OMIM** | Curada | No redundante | Genes y enfermedades mendelianas |
-| **gnomAD** | Curada | No redundante | Frecuencias alélicas en ~125.000 genomas de referencia |
-| **COSMIC** | Curada | No redundante | Mutaciones somáticas en cáncer |
+### INSDC: el acuerdo de intercambio entre GenBank, EMBL y DDBJ
+
+El INSDC formado en 1988 explica por qué GenBank, EMBL y DDBJ son esencialmente lo mismo pero tres cosas distintas. Los tres son repositorios no curados y redundantes de secuencias de nucleótidos. Los tres se sincronizan diariamente. El formato de los registros es el mismo. Para el usuario práctico, es indiferente consultar cualquiera de los tres: el contenido es el mismo. Existen los tres por razones históricas y políticas: cada región geográfica quería tener su nodo.
 
 ### Otras bases importantes
 
 | BD | Tipo | Curación | Notas |
 |----|------|----------|-------|
+| **GEO** | Primaria | No curada | Repositorio NCBI de microarrays y RNA-seq |
+| **ArrayExpress** | Primaria | No curada | Equivalente europeo (EBI) |
+| **GTEx** | Secundaria | Curada | Expresión por tejido en humanos sanos |
+| **dbSNP** | Primaria | No curada | Repositorio de todos los SNPs; IDs `rs` |
+| **ClinVar** | Primaria | Curada | Variantes con significado clínico (Patogénica/VUS/Benigna) |
+| **OMIM** | Secundaria | Curada | Genes y enfermedades mendelianas |
+| **gnomAD** | Secundaria | Curada | Frecuencias alélicas en ~125.000 genomas de referencia |
+| **COSMIC** | Secundaria | Curada | Mutaciones somáticas en cáncer |
 | **SGD** | Secundaria | Curada | S. cerevisiae; integra GenBank + UniProt + literatura |
 | **FlyBase** | Secundaria | Curada | D. melanogaster |
 | **KEGG** | Secundaria | Curada | Pathways metabólicos y de señalización |
-| **PubMed** | Secundaria | Curada | Literatura biomédica; indexada por MeSH |
-| **PubChem** | Primaria | No curada | Estructuras químicas; redundante |
-| **DrugBank** | Secundaria | Curada | Fármacos con targets, mecanismo, farmacocinética |
 | **IntAct** | Secundaria | Curada | Interacciones proteína-proteína |
+| **DrugBank** | Secundaria | Curada | Fármacos con targets, mecanismo, farmacocinética |
+
+### Lo que se pregunta en el parcial sobre bases de datos
+
+**"Dar un ejemplo de BD curada":** RefSeq, Swiss-Prot, PDB, SGD, FlyBase, ClinVar, KEGG. Argumentar: hay revisión humana antes de que el dato entre.
+
+**"Dar un ejemplo de BD no curada":** GenBank, TrEMBL, GEO, ArrayExpress, dbSNP. Argumentar: el autor deposita directamente, no hay verificación sistemática.
+
+**"Dar un ejemplo de BD primaria":** GenBank, RefSeq, Swiss-Prot, TrEMBL, PDB, GEO. Argumentar: el dato viene de experimentos de laboratorio.
+
+**"Dar un ejemplo de BD secundaria":** SGD, FlyBase, KEGG, Ensembl, PFAM, PROSITE, IntAct, DrugBank. Argumentar: el contenido se genera por análisis bioinformático de datos primarios, no por nuevos experimentos.
+
+**"¿Por qué una búsqueda de fibronectina en GenBank devuelve 10.000 resultados?":** GenBank es no curada y redundante. Cada laboratorio que secuenció cualquier fragmento o variante subió su secuencia. Para la secuencia de referencia, hay que ir a RefSeq o Swiss-Prot.
+
+**"¿Por qué hay 300 estructuras de la misma proteína en el PDB?":** el PDB es redundante porque la misma proteína puede cristalizarse en distintas condiciones, con distintos ligandos, con distintas mutaciones, en distintos estados conformacionales. Cada estructura aporta información biológica diferente.
+
+**"¿Qué es el INSDC?":** el International Nucleotide Sequence Database Collaboration, formado en 1988 entre GenBank (NCBI, EE.UU.), EMBL/ENA (EBI, Europa) y DDBJ (Japón). Los tres se sincronizan diariamente y usan el mismo formato. Depositar en cualquiera equivale a depositar en los tres.
 
 ---
 
-## 6. Bases de Datos Secundarias — HMM, PROSITE, InterPro
+## Clase 2 — Alineamiento de Secuencias, Matrices y Aminoácidos
+
+### Por qué importan las propiedades fisicoquímicas en bioinformática
+
+En bioinformática, los aminoácidos no son solo letras de un alfabeto de 20 caracteres. Cada letra trae consigo una identidad química que determina tres cosas clave:
+
+1. **Qué sustituciones son toleradas evolutivamente** → eso es exactamente lo que codifica BLOSUM62. Si dos aminoácidos comparten propiedades fisicoquímicas, es probable que uno pueda reemplazar al otro sin destruir la función → la sustitución se observa en la evolución → score positivo en la matriz.
+
+2. **Qué residuos aparecen en qué contextos estructurales.** Los hidrofóbicos se entierran en el núcleo de la proteína, lejos del solvente. Los polares y cargados aparecen en la superficie. La Glicina aparece en giros porque es flexible. La Prolina aparece en kinks porque la fuerza.
+
+3. **Qué motivos de secuencia tienen significado funcional.** El motivo de N-glicosilación es N-{P}-[S/T] (Asn, cualquier cosa excepto Pro, Ser o Thr). Si hubiera Pro en esa segunda posición, no funciona → porque la Pro distorsiona la estructura local que reconoce la enzima transferasa.
+
+### Clasificación por grupos fisicoquímicos — con razonamiento
+
+**Hidrofobicidad** importa porque el plegamiento de proteínas en solución acuosa está impulsado principalmente por el efecto hidrofóbico: los residuos apolares tienden a quedar en el interior, alejados del agua.
+
+```
+HIDROFÓBICOS: I  V  L  M  A  G  C  F  Y  W
+```
+
+**Carga eléctrica** importa para interacciones electrostáticas. Los residuos cargados aparecen en la superficie de la proteína. Forman puentes salinos, sitios de unión a DNA (Lys y Arg básicas interactúan con el fosfato), y sitios activos enzimáticos.
+
+```
+ÁCIDOS (carga −): D (Asp, pKa ≈3.9)   E (Glu, pKa ≈4.1)
+BÁSICOS (carga +): K (Lys, pKa ≈10.5)  R (Arg, pKa ≈12.5)  H (His, pKa ≈6)
+```
+
+**Capacidad de formar puentes de hidrógeno** — los residuos polares (con grupos –OH, –NH₂, –CONH₂) forman puentes H con el solvente y entre sí. Esos puentes contribuyen a la estructura secundaria (hélices α y láminas β).
+
+```
+POLARES sin carga: S  T  C  N  Q
+```
+
+**Aromaticidad** — los aromáticos tienen anillos planos que apilan entre sí (interacciones π-π) y absorben UV a ~280 nm. Esa absorbancia se usa en laboratorio para cuantificar proteínas.
+
+```
+AROMÁTICOS: F  Y  W
+```
+
+### Los 20 aminoácidos — referencia completa
+
+| 1L | 3L  | Nombre           | Grupo principal        | Notas clave para el parcial |
+|:--:|:---:|------------------|------------------------|-----------------------------|
+| A  | Ala | Alanina          | Pequeño, hidrofóbico   | Frecuente en α-hélices |
+| R  | Arg | Arginina         | Básico (+)             | pKa ≈12.5 → carga + muy estable a pH fisiológico; interacciona con DNA |
+| N  | Asn | Asparagina       | Polar sin carga        | Sitio de N-glicosilación: motivo **N-{P}-[S/T]** |
+| D  | Asp | Ácido aspártico  | Ácido (−)              | pKa ≈3.9; cadena corta; score D↔E = +2 |
+| C  | Cys | Cisteína         | Polar / hidrofóbico    | Puentes disulfuro; sitios activos nucleofílicos; 2do más raro |
+| Q  | Gln | Glutamina        | Polar sin carga        | N↔Q y D↔E son sustituciones conservativas |
+| E  | Glu | Ácido glutámico  | Ácido (−)              | pKa ≈4.1; E = D + un CH₂ |
+| G  | Gly | Glicina          | Tiny / flexible        | **Sin cadena lateral → máxima flexibilidad → loops, giros, colágeno (Gly-X-Y)** |
+| H  | His | Histidina        | Básico / aromático     | **Único pKa ≈6 → puede ceder o tomar H⁺ a pH 7 → catálisis ácido-base (tríada Ser-His-Asp)** |
+| I  | Ile | Isoleucina       | Alifático, hidrofóbico | Isómero de Leu; L↔I es sustitución muy conservativa |
+| L  | Leu | Leucina          | Alifático, hidrofóbico | El más frecuente en proteínas globulares |
+| K  | Lys | Lisina           | Básico (+)             | pKa ≈10.5; sitio de ubiquitinación → degradación; interacciona con DNA |
+| M  | Met | Metionina        | Hidrofóbico, azufre    | Codón de inicio AUG → toda proteína empieza con Met |
+| F  | Phe | Fenilalanina     | Aromático              | Núcleo hidrofóbico; absorbe UV a 280nm levemente |
+| P  | Pro | Prolina          | Especial / rígido      | **Anillo pirrolidina unido al N del backbone → no puede donar H en puentes H → rompe hélices α y láminas β → fuerza kinks → NO va en posición X del motivo N-glicosilación** |
+| S  | Ser | Serina           | Polar pequeño (–OH)    | Fosforilación (Ser-kinasas); O-glicosilación; posición [S/T] en N-glicosilación |
+| T  | Thr | Treonina         | Polar (–OH)            | Fosforilación; posición [S/T] en motivo N-glicosilación |
+| W  | Trp | Triptófano       | Aromático, grande      | **El más raro (~1%) → casi siempre crítico funcionalmente → score W↔W = +11 → mayor absorbancia UV a 280nm** |
+| Y  | Tyr | Tirosina         | Aromático + polar (–OH)| Fosforilación (Tyr-kinasas → señalización); absorbe fuerte a 280nm |
+| V  | Val | Valina           | Alifático, hidrofóbico | Volumen: V < L = I; ramificado → desestabiliza hélices α |
+
+### Diagrama de grupos fisicoquímicos
+
+```
+                      TINY
+                    ┌──────────┐
+                    │  G   A   │
+                    └──────────┘
+                    (subconjunto de SMALL)
+┌─────────────────────────────────────────────────────┐
+│                      SMALL                          │
+│         G   A   C   S   N   D   T   P               │
+└─────────────────────────────────────────────────────┘
+
+ALIPHATIC:     I   V   L
+AROMATIC:      F   Y   W
+
+HYDROPHOBIC (se entierran en el núcleo):
+   I   V   L   M   A   G   C   F   Y   W
+
+POLAR (hacen puentes H, suelen estar en superficie):
+   S   T   C   N   Q   D   E   K   R   H
+
+CHARGED (carga neta a pH 7):
+   D   E   → negativas / ácidas
+   K   R   → positivas / básicas
+   H       → básico solo a pH ≤6; neutro a pH 7
+```
+
+**Regla para BLOSUM:** dos aminoácidos que comparten grupo → sustitución conservativa → score positivo en BLOSUM62.
+
+### Aminoácidos especiales con su rol mecanístico
+
+**Glicina (G):** la glicina es el único aminoácido sin cadena lateral (solo un H). Eso le da libertad de rotación en el backbone que ningún otro aminoácido tiene. Aparece en loops y giros (turns) donde la cadena polipeptídica necesita doblar en un ángulo imposible para otro residuo. También en colágeno (repetición Gly-Pro-Hyp): el Gly va en el interior del triple hélice, donde no cabe ningún otro residuo.
+
+**Prolina (P):** la prolina tiene su cadena lateral cíclica unida al nitrógeno del backbone, formando un anillo de pirrolidina de 5 miembros. Consecuencias: (1) no puede donar H al backbone → rompe la red de puentes H de la hélice α y la lámina β; (2) fuerza ángulos ψ/φ inusuales → introduce un kink (quiebre) en la cadena polipeptídica; (3) no va en la posición X del motivo N-glicosilación N-X-[S/T]: la oligosacaril-transferasa no reconoce el motivo si X es Pro. BLOSUM: scores negativos con prácticamente todos los demás aminoácidos.
+
+**Cisteína (C):** el grupo tiol (–SH) permite: (1) puentes disulfuro — dos Cys pueden oxidarse para formar un puente covalente S–S, estabiliza proteínas extracelulares (anticuerpos, proteínas secretadas); (2) nucleofilia: el azufre es buen nucleófilo a pH fisiológico → sitios activos de proteasas de cisteína. Es el segundo aminoácido más raro (después de Trp).
+
+**Histidina (H):** el único aminoácido cuyo pKa (≈6.0) cae en el rango fisiológico (pH 6–8). Puede actuar como donante o aceptor de protones (H⁺) a pH 7 → rol central en catálisis ácido-base. Aparece en la **tríada catalítica** de muchas hidrolasas: **Ser-His-Asp**. La His transfiere el H⁺ de la Ser al Asp, activando la Ser como nucleófilo para atacar el enlace peptídico. También coordina iones metálicos (Zn²⁺, Fe²⁺) en sitios activos metalo-enzimáticos.
+
+**Triptófano (W):** el más raro de los 20 aminoácidos (~1% de todos los residuos). Casi siempre crítico funcionalmente: si un Trp está conservado en una familia proteica (aparece prominente en el logo de un HMM), es una señal fortísima de que es esencial. Score W↔W = +11 en BLOSUM62 (la señal evolutiva más fuerte de la matriz). Mayor absorbancia UV a 280 nm de todos los aminoácidos → domina la lectura de absorbancia para cuantificar proteína en laboratorio.
+
+### Modificaciones post-traduccionales (PTMs)
+
+Las PTMs son cambios químicos que ocurren luego de que la proteína fue sintetizada en el ribosoma. Regulan función, localización y vida media de la proteína.
+
+| Modificación | Aminoácido(s) | Función biológica | Nota clave |
+|---|---|---|---|
+| **Fosforilación** | Ser (S), Thr (T), Tyr (Y) | Señalización celular: activa o inactiva enzimas, recluta proteínas. Reversible (fosfatasas lo quitan). | Las kinasas reconocen secuencias consenso. Ser-kinasas, Thr-kinasas, Tyr-kinasas son clases distintas. |
+| **N-glicosilación** | Asn (N) en el motivo **N-{P}-[S/T]** | Plegamiento correcto en el RE, estabilidad térmica, reconocimiento celular. | La Pro en posición X impide la modificación → N-P-[S/T] NO se glicosilará. |
+| **O-glicosilación** | Ser (S), Thr (T) | Regulación de transcripción; señalización alternativa a la fosforilación. | Compite con fosforilación en los mismos residuos Ser/Thr. |
+| **Ubiquitinación** | Lys (K) | Marca proteínas para degradación por el proteasoma 26S. También regula transcripción (histonas). | La Lys tiene pKa ≈10.5 → cargada + a pH 7. |
+| **Puentes disulfuro** | Cys–Cys | Estabilidad covalente en proteínas secretadas/extracelulares. Los anticuerpos (IgG) dependen de múltiples puentes S–S. | El par Cys–Cys en posiciones compatibles del alineamiento es un indicador estructural conservado. |
+| **Acetilación** | Lys (histonas), Met N-terminal | En histonas: abre la cromatina, activa transcripción. En Met N-terminal: regula estabilidad de la proteína. | Las marcas epigenéticas (H3K27ac, etc.) son Lys acetiladas en colas de histonas. |
+
+---
+
+
+### Por qué el sistema match/mismatch no alcanza
+
+Cuando uno arma un alineamiento con programación dinámica (NW o SW), necesita un número para cada par de aminoácidos alineados. La opción más cruda sería: match = +1, mismatch = −1. El problema es que eso trata todos los cambios como si fueran igualmente probables o igualmente dañinos, y la biología nos dice que eso es falso.
+
+El razonamiento: pensá en dos proteínas que divergieron hace 50 millones de años. En ese tiempo hubo mutaciones, pero las que sobrevivieron son las que no destruyeron la función. Si una Leucina (hidrofóbica, apolar) muta a una Isoleucina (también hidrofóbica, también apolar), la proteína probablemente sigue funcionando igual. Esa sustitución va a aparecer muchas veces cuando uno mira alineamientos de proteínas reales. En cambio, si esa Leucina muta a un Ácido glutámico (cargado negativamente), el interior hidrofóbico se va a desestabilizar, la proteína probablemente se pierde, y esa mutación raramente se fija.
+
+La idea entonces es: **observar qué sustituciones ocurren realmente en la evolución y codificarlas como puntaje**. La fórmula conceptual es:
+
+```
+score(a, b) = log [ P(a y b alineados en la naturaleza) / P(a y b por azar) ]
+```
+
+- Si el par aparece más de lo esperado al azar → logaritmo > 0 → score positivo.
+- Si el par aparece menos de lo esperado al azar → logaritmo < 0 → score negativo.
+
+Esto explica por qué Trp↔Trp tiene score 11: el Triptófano es rarísimo (~1% de todos los residuos), entonces encontrar dos Trp alineados es estadísticamente muy improbable al azar → señal evolutiva muy fuerte → score alto.
+
+### Familia PAM — modelo evolutivo extrapolado
+
+**PAM** significa *Point Accepted Mutation* (mutación puntual aceptada por la selección natural).
+
+**Cómo se construye:** Margaret Dayhoff y colaboradores en los 70s agarraron alineamientos de proteínas que eran muy cercanamente relacionadas (más del 85% de identidad de secuencia). Con eso contaron, para cada par de aminoácidos (i, j), cuántas veces se observó que i fue reemplazado por j → matriz de probabilidades de sustitución para 1 PAM de distancia evolutiva.
+
+**¿Qué es 1 PAM?** Es la cantidad de evolución necesaria para que, en promedio, 1 de cada 100 aminoácidos de una proteína cambie (1% de divergencia). Es una unidad de distancia evolutiva, no de tiempo.
+
+**La extrapolación:** la matriz de 1 PAM se puede multiplicar por sí misma (multiplicación de matrices de Markov) para simular el efecto de múltiples pasos evolutivos. PAM250 = PAM1 multiplicada 250 veces. Eso modela proteínas que tienen 250 unidades de divergencia acumulada, equivalente a secuencias que comparten ~20% de identidad residual.
+
+```
+PAM1   → proteínas casi idénticas (>85% de identidad)
+PAM40  → proteínas moderadamente relacionadas
+PAM120 → proteínas con ~40% de identidad
+PAM250 → proteínas muy divergentes (~20% de identidad)
+```
+
+### Familia BLOSUM — observación directa de bloques conservados
+
+**BLOSUM** significa *BLOcks SUbstitution Matrix*. Henikoff & Henikoff (1992) tomaron la base de datos BLOCKS y contaron directamente las sustituciones observadas entre pares de secuencias. No hay extrapolación: se observan directamente las sustituciones que aparecen en bloques conservados reales.
+
+El número en el nombre indica el **umbral de identidad** con el que se agruparon las secuencias:
+
+```
+BLOSUM80 → bloques con secuencias ≥80% idénticas → para proteínas muy similares
+BLOSUM62 → bloques con ≥62% de identidad → el estándar de facto (default de BLAST)
+BLOSUM45 → bloques con ≥45% de identidad → para proteínas más divergentes
+```
+
+**La confusión de los números (¡importante para el parcial!):** En PAM, número grande = más divergencia (PAM250 = muy lejano). En BLOSUM, número grande = más similitud de las secuencias usadas para construirla (BLOSUM80 = construida con secuencias muy parecidas). Son escalas opuestas.
+
+```
+Para proteínas CERCANAS:   BLOSUM80  o  PAM40
+Para proteínas ALEJADAS:   BLOSUM45  o  PAM250
+Default (la mayoría):      BLOSUM62
+```
+
+### La diferencia conceptual central entre PAM y BLOSUM
+
+| | PAM | BLOSUM |
+|---|---|---|
+| Origen de los datos | Proteínas muy cercanas (>85% id) | Bloques conservados en familias diversas |
+| Mecanismo | Modelo de Markov: multiplicación iterativa de PAM1 | Conteo estadístico directo |
+| Escala del número | Número alto = más divergencia | Número alto = más similitud en los datos |
+| Limitación | La extrapolación asume proceso evolutivo estacionario | Requiere muchas secuencias con bloques bien definidos |
+
+En clase se enfatizó que BLOSUM es generalmente preferida porque no extrapola, sino que observa directamente qué sustituciones aparecen en familias proteicas reales.
+
+### Cómo leer la matriz — ejemplos concretos con BLOSUM62
+
+```
+Par         Score   Razón biológica
+───────────────────────────────────────────────────────────────────
+W ↔ W       +11    Trp rarísimo, encontrar dos = señal evolutiva fuerte
+P ↔ P       +7     Pro casi nunca cambia → su auto-match vale mucho
+F ↔ Y       +3     Ambos aromáticos, Y tiene solo un OH extra
+V ↔ I       +3     Ambos alifáticos, tamaños similares
+L ↔ I       +2     Ambos alifáticos + hidrofóbicos
+D ↔ E       +2     Ambos ácidos (carga −), E es D + un CH₂
+K ↔ R       +2     Ambos básicos (carga +)
+S ↔ T       +1     Ambos polares pequeños con grupo –OH
+K ↔ E        0     Cargas opuestas, sin conservación de función
+L ↔ D       −4     Hidrofóbico vs. ácido; grupos completamente distintos
+P ↔ L       −3     Pro rompe estructura; sin similitud funcional
+```
+
+**El caso especial de Prolina:** En el parcial preguntaron "¿por qué Prolina no puede estar en el motivo de N-glicosilación?" y "¿qué dice la matriz BLOSUM de los cambios a Prolina?" La respuesta es que la Prolina tiene su cadena lateral unida al nitrógeno del backbone, formando un anillo rígido. Eso le impide donar hidrógeno en la red de puentes H de las estructuras secundarias, y fuerza un ángulo de torsión distinto al de todos los demás aminoácidos. Insertar una Pro donde había cualquier otro aminoácido es casi siempre estructuralmente disruptivo → sustitución rarísima en la evolución → **todos los scores de Pro contra otros aminoácidos son negativos**.
+
+### Regla de oro para elegir matriz
+
+```
+Situación                                    Matriz recomendada
+──────────────────────────────────────────────────────────────────
+Comparación estándar / búsqueda en BLAST     BLOSUM62  (default)
+Proteínas muy similares (>70% id)            BLOSUM80 o PAM40
+Detección de homólogos lejanos (<30% id)     BLOSUM45 o PAM250
+PSI-BLAST (iterativo)                        BLOSUM62 para la primera ronda;
+                                             después PSSM sitio-específica
+```
+
+---
+
+
+### ¿Qué es un alineamiento y para qué sirve?
+
+Antes de meterse con los algoritmos, hay que entender *por qué* alinear secuencias en primer lugar.
+
+El profe arrancó la clase con un experimento mental: imaginá que sos un biólogo marciano que llega a la Tierra y quiere estudiar la fauna. Tenés una muestra: un perro, un gato, un cocodrilo, una mosca, un mosquito. Un amigo te dice "tengo un tigre que no conozco, ¿qué me podés decir de él?". Sin saber nada del tigre, mirás su tamaño, contás sus patas, ves si tiene pelo, y automáticamente lo agrupás con el perro y el gato. Y entonces podés predecir: tiene cuatro patas, es mamífero, da de mamar a sus crías, tiene sangre caliente.
+
+Eso es **inferencia por asociación** (el profe dice "dime con quién andas y te diré quién eres"). Lo mismo aplica a las secuencias biológicas. Si una secuencia nueva es muy parecida a secuencias cuya función ya conocés, podés inferir que tiene la misma función. El alineamiento es la herramienta que te permite medir ese parecido de manera rigurosa.
+
+**El alineamiento es una comparación de secuencias.** Consiste en poner las secuencias en filas y tratar de que, en cada columna, queden los caracteres que se "corresponden" o son equivalentes entre sí. Así como un lingüista que alinea la palabra "sal" en castellano, francés, italiano y portugués nota que la primera letra y la última son iguales y que difieren solo en el medio (y puede separar claramente ese grupo de la palabra "azúcar" en los mismos idiomas), un biólogo que alinea secuencias de proteínas puede notar qué posiciones están conservadas y cuáles cambiaron.
+
+---
+
+### Dot plot: el alineamiento visual
+
+El dot plot es el método más simple para visualizar la similitud entre dos secuencias. Es un método **gráfico**: no te da directamente el alineamiento escrito, sino que te muestra las regiones de similitud como una imagen.
+
+#### Cómo se construye
+
+1. Ponés una secuencia en el eje horizontal (columnas).
+2. Ponés la otra secuencia en el eje vertical (filas).
+3. En cada celda (i, j), ponés un punto **si el carácter i de la secuencia vertical coincide con el carácter j de la secuencia horizontal**.
+4. Dejás vacío donde no hay coincidencia.
+
+```
+Ejemplo: alinear ATCG (horizontal) vs ACGT (vertical)
+
+     A  T  C  G
+A  [ .           ]
+C  [    .        ]
+G  [       .     ]
+T  [  .          ]
+```
+
+#### Cómo se lee el dot plot
+
+Lo importante es lo que pasa con la diagonal. Si las dos secuencias son idénticas, todos los puntos van a estar exactamente en la diagonal principal (de arriba-izquierda a abajo-derecha), formando una línea perfecta.
+
+Cuando las secuencias son similares pero no idénticas:
+- **Seguir por la diagonal** = hay un match.
+- **Saltar la diagonal un paso hacia la derecha** = estás metiendo un **gap en la secuencia vertical**. Tuviste que saltear un carácter de la horizontal para poder seguir encontrando matches.
+- **Saltar la diagonal un paso hacia abajo** = gap en la secuencia horizontal.
+
+```
+Ejemplo:
+Sec. 1 (horizontal): A T C G A
+Sec. 2 (vertical):   A C G A
+
+     A  T  C  G  A
+A  [ .           . ]
+C  [    .          ]
+G  [       .       ]
+A  [           .   ]
+
+Alineamiento que surge: seguir la diagonal con un gap en la T.
+
+Sec1:  A T C G A
+Sec2:  A - C G A   (gap donde estaba la T)
+```
+
+#### Cómo interpretar distintos patrones en el dot plot
+
+| Patrón en el dot plot | Qué significa biológicamente |
+|---|---|
+| Diagonal perfecta de extremo a extremo | Las dos secuencias son idénticas |
+| Diagonal continua con algunos huecos | Secuencias muy similares, pequeñas variaciones |
+| Diagonal con saltos (quiebres) | Hay gaps / inserciones / deleciones |
+| Diagonal solo en una región | Solo parte de la secuencia alinea → candidato a alineamiento local |
+| Diagonal en la anti-diagonal | Una secuencia es el reverso de la otra (palíndromo) |
+| El mismo segmento aparece dos veces en la diagonal | Hubo una duplicación interna |
+| Sin diagonal reconocible | Las secuencias no se parecen globalmente |
+
+#### El filtro del dot plot (window size)
+
+Si las secuencias son largas y tienen muchos matches aislados por azar, el dot plot queda lleno de puntos y no se puede leer nada. Por eso se aplica un **filtro de ventana (window size)**:
+- Solo se dibuja un punto si hay, dentro de una ventana de `w` posiciones, al menos `k` matches consecutivos.
+- Ejemplo: ventana = 5, mínimo 4 matches → solo se conservan segmentos donde hay 4 o más matches en 5 posiciones consecutivas.
+
+Un filtro muy estricto puede ocultar similitud real; uno muy laxo deja pasar ruido.
+
+---
+
+### Sistema de puntuación: ¿cómo sé cuál alineamiento es mejor?
+
+Cuando el dot plot muestra varias diagonales posibles, necesitás una manera de decidir cuál es mejor. Eso se hace con una **función de puntuación (scoring function)**.
+
+#### El problema con "match = 1, mismatch = 0"
+
+Mirá este ejemplo: tenés dos alineamientos alternativos de las mismas secuencias proteicas. Uno alinea la tirosina con el triptófano (dos aminoácidos raros y funcionalmente similares). El otro alinea serina con alanina (aminoácidos comunes). Con una función simple (match = +1, mismatch = 0), los dos dan el **mismo puntaje**. Pero biológicamente, alinear triptófano con tirosina es mucho más significativo: son aminoácidos raros, y si aparecen en la misma posición en dos proteínas distintas, probablemente cumplan un rol funcional conservado.
+
+Conclusión: para proteínas, necesitás una función que refleje el **grado de parecido entre aminoácidos**, no solo si son iguales o no. Ver Clase 2 para las matrices PAM y BLOSUM.
+
+**Para DNA:** en general basta con match = +1, mismatch = -1. Las cuatro bases no tienen tanto "grado de parecido" entre sí como los 20 aminoácidos.
+
+---
+
+### Penalización por gaps: lineal vs affine
+
+#### Por qué los gaps son especiales
+
+Un gap en el alineamiento representa una inserción o deleción ocurrida a lo largo de la evolución. Lo importante biológicamente es que **una sola deleción puede eliminar varios nucleótidos o aminoácidos contiguos en un solo evento mutacional**.
+
+> Una deleción de 10 bases es **un evento** evolutivo, no diez eventos independientes.
+
+Entonces, tiene más sentido biológico permitir **un gap largo** que forzar **muchos gaps chicos**. Un gap largo (de 10 posiciones) probablemente refleja una sola deleción real.
+
+#### Gap lineal (el más simple)
+
+```
+W(k) = d × k       (d = costo por posición, k = largo del gap)
+
+Ejemplo: d = -2, gap de longitud 3  → costo = -6
+         d = -2, tres gaps de largo 1 → costo total = -6
+
+Con gap lineal, da lo mismo 1 gap de 3 que 3 gaps de 1.
+No refleja la biología.
+```
+
+#### Gap affine (el realista)
+
+```
+W(k) = a + b × k
+
+donde:
+  a = penalización por ABRIR el gap    (costo fijo, se paga solo la primera vez)
+  b = penalización por EXTENDER el gap (costo por cada posición adicional)
+
+Biológicamente: a >> b
+  → abrir un gap es caro (implica un evento de inserción/deleción)
+  → extender el gap es barato (agregar una posición más al mismo evento)
+```
+
+**Ejemplo típico para DNA:** a = -5 (abrir), b = -1 (extender)
+
+```
+Un gap de 1 posición:     -5 + (-1×1) = -6
+Un gap de 5 posiciones:   -5 + (-1×5) = -10
+Cinco gaps de 1 posición: 5 × (-6)    = -30
+
+→ Un gap de 5 es mucho más barato que cinco gaps de 1.
+→ El algoritmo va a preferir los gaps largos concentrados.
+```
+
+Con gap affine: venir desde la izquierda (misma fila) = extender gap (costo b). Venir desde la diagonal = abrir gap nuevo (costo a).
+
+---
+
+### Programación dinámica: NW y SW
+
+#### El problema computacional
+
+Para encontrar el mejor alineamiento entre dos secuencias, en principio habría que probar todos los alineamientos posibles y quedarse con el de mayor puntaje. La cantidad de alineamientos posibles crece de manera explosiva → inviable para secuencias reales.
+
+La solución es **programación dinámica**: en vez de resolver el problema grande directamente, lo dividís en problemas más chicos y vas construyendo la solución de a poco.
+
+La clave es el **principio de optimalidad de Bellman**: si el alineamiento óptimo de dos secuencias completas pasa por alinear los primeros `i` caracteres de la primera con los primeros `j` de la segunda de cierta manera, entonces esa sub-alineación también tiene que ser óptima para esos prefijos. Eso garantiza que se puede construir la solución óptima global a partir de sub-soluciones óptimas locales.
+
+---
+
+### Needleman-Wunsch (NW): alineamiento global
+
+#### Cuándo usarlo
+
+Cuando las dos secuencias son de longitud similar y querés alinearlas **de punta a punta**. Por ejemplo: comparar el gen de una proteína en dos especies donde ambas secuencias corresponden al gen completo.
+
+#### Lógica de la recurrencia
+
+Construís una matriz `F` de tamaño `(n+1) × (m+1)` donde `n` = largo de la secuencia X (vertical) y `m` = largo de la secuencia Y (horizontal).
+
+Para llegar a la celda `F(i,j)`, solo tenés tres opciones de dónde venir:
+
+```
+1. Diagonal ↖: venías alineando caracteres. Alineaste xᵢ con yⱼ.
+   Puntaje tentativo: F(i-1, j-1) + s(xᵢ, yⱼ)   [s = score de la sustitución]
+
+2. Desde arriba ↑: pusiste un gap en la secuencia Y (horizontal).
+   Puntaje tentativo: F(i-1, j) + gap_penalty
+
+3. Desde la izquierda ←: pusiste un gap en la secuencia X (vertical).
+   Puntaje tentativo: F(i, j-1) + gap_penalty
+```
+
+Te quedás con el máximo de las tres:
+
+```
+F(i,j) = max {
+    F(i-1, j-1) + s(xᵢ, yⱼ)    ← diagonal (match/mismatch)
+    F(i-1, j)   + gap_penalty    ← arriba    (gap en Y)
+    F(i, j-1)   + gap_penalty    ← izquierda (gap en X)
+}
+```
+
+#### Inicialización
+
+La primera fila y la primera columna representan alinear contra nada (puro gap):
+
+```
+F(0, 0) = 0
+F(i, 0) = i × gap_penalty    para todo i > 0
+F(0, j) = j × gap_penalty    para todo j > 0
+```
+
+Con gap lineal = -1: la primera fila es 0, -1, -2, -3, ... y la primera columna igual.
+
+#### El traceback
+
+Al llenar la matriz, en cada celda anotás también **de dónde viniste** (diagonal, arriba o izquierda). Esto forma la **matriz de traceback**.
+
+Una vez llenada la matriz:
+1. Empezás en la celda `F(n, m)` (esquina inferior derecha).
+2. Seguís las flechas hacia atrás hasta llegar a `F(0, 0)`.
+3. Cada paso del traceback construye el alineamiento al revés:
+   - Flecha diagonal ↖: alineaste xᵢ con yⱼ (match o mismatch).
+   - Flecha arriba ↑: gap en Y (ponés `-` en la secuencia horizontal, avanzás solo en la vertical).
+   - Flecha izquierda ←: gap en X (ponés `-` en la secuencia vertical, avanzás solo en la horizontal).
+
+---
+
+### Ejemplo resuelto paso a paso: NW
+
+**Secuencias:**
+```
+X (vertical):   A C G T
+Y (horizontal): A G T
+```
+
+**Parámetros:** match = +1, mismatch = -1, gap lineal = -1
+
+**Paso 1: Inicialización**
+
+```
+        ""   A    G    T
+""    [  0   -1   -2   -3 ]
+A     [ -1    .    .    . ]
+C     [ -2    .    .    . ]
+G     [ -3    .    .    . ]
+T     [ -4    .    .    . ]
+```
+
+**Paso 2: Llenado celda a celda**
+
+`F(1,1)`: alinear A (de X) con A (de Y).
+- Diagonal: F(0,0) + s(A,A) = 0 + 1 = **+1**
+- Arriba: F(0,1) + gap = -1 + (-1) = -2
+- Izquierda: F(1,0) + gap = -1 + (-1) = -2
+→ `F(1,1) = +1` (viene de diagonal ↖)
+
+`F(1,2)`: alinear A (de X) con G (de Y).
+- Diagonal: F(0,1) + s(A,G) = -1 + (-1) = -2
+- Arriba: F(0,2) + gap = -2 + (-1) = -3
+- Izquierda: F(1,1) + gap = +1 + (-1) = **0**
+→ `F(1,2) = 0` (viene de izquierda ←)
+
+`F(2,1)`: alinear C (de X) con A (de Y).
+- Diagonal: F(1,0) + s(C,A) = -1 + (-1) = -2
+- Arriba: F(1,1) + gap = +1 + (-1) = **0**
+- Izquierda: F(2,0) + gap = -2 + (-1) = -3
+→ `F(2,1) = 0` (viene de arriba ↑)
+
+`F(2,2)`: alinear C (de X) con G (de Y).
+- Diagonal: F(1,1) + s(C,G) = +1 + (-1) = **0**
+- Arriba: F(1,2) + gap = 0 + (-1) = -1
+- Izquierda: F(2,1) + gap = 0 + (-1) = -1
+→ `F(2,2) = 0` (viene de diagonal ↖)
+
+`F(3,2)`: alinear G (de X) con G (de Y).
+- Diagonal: F(2,1) + s(G,G) = 0 + 1 = **+1**
+- Arriba: F(2,2) + gap = 0 + (-1) = -1
+- Izquierda: F(3,1) + gap = -1 + (-1) = -2
+→ `F(3,2) = +1` (viene de diagonal ↖)
+
+`F(4,3)`: alinear T (de X) con T (de Y).
+- Diagonal: F(3,2) + s(T,T) = +1 + 1 = **+2**
+- Arriba: F(3,3) + gap = 0 + (-1) = -1
+- Izquierda: F(4,2) + gap = 0 + (-1) = -1
+→ `F(4,3) = +2` (viene de diagonal ↖)
+
+**Matriz completa:**
+
+```
+        ""   A    G    T
+""    [  0   -1   -2   -3 ]
+A     [ -1   +1    0   -1 ]
+C     [ -2    0    0   -1 ]
+G     [ -3   -1   +1    0 ]
+T     [ -4   -2    0   +2 ]
+```
+
+**Paso 3: Traceback** (empezando en F(4,3) = +2)
+
+1. `F(4,3)` → diagonal ↖ → alineamos **T** (X) con **T** (Y) → match
+2. `F(3,2)` → diagonal ↖ → alineamos **G** (X) con **G** (Y) → match
+3. `F(2,1)` → arriba ↑ → gap en Y → alineamos **C** (X) contra **-**
+4. `F(1,1)` → diagonal ↖ → alineamos **A** (X) con **A** (Y) → match
+
+**El alineamiento resultante:**
+
+```
+X:   A  C  G  T
+Y:   A  -  G  T
+     |     |  |
+  match  gap  match  match
+
+Score = +1 (A-A) + (-1) (gap en C) + +1 (G-G) + +1 (T-T) = +2  ✓
+```
+
+---
+
+### Smith-Waterman (SW): alineamiento local
+
+#### Cuándo usarlo
+
+Cuando las secuencias son de longitud diferente, o cuando solo comparten una región (un dominio). Por ejemplo: una proteína que tiene un dominio conocido incrustado en una cadena mucho más larga.
+
+Hoy en día, el alineamiento local es el más usado en la práctica. Si hay regiones que no se parecen, el algoritmo global las fuerza a alinearse de todos modos (con puntaje muy negativo), ensuciando el resultado. Con SW, esas regiones directamente no aparecen.
+
+#### La única diferencia con NW: el piso de cero
+
+```
+F(i,j) = max {
+    0                             ← NUNCA baja de cero
+    F(i-1, j-1) + s(xᵢ, yⱼ)
+    F(i-1, j)   + gap_penalty
+    F(i, j-1)   + gap_penalty
+}
+```
+
+El cero actúa como un "reset": cuando el alineamiento acumulado se vuelve tan malo que baja de cero, es mejor olvidar todo y empezar un alineamiento nuevo desde cero que seguir arrastrando un puntaje negativo.
+
+#### Comparación directa NW vs SW
+
+```
+                  NW (global)               SW (local)
+────────────────────────────────────────────────────────────
+Inicialización    F(i,0) = i × gap           F(i,0) = 0
+primera fila/col  F(0,j) = j × gap           F(0,j) = 0
+
+Recurrencia       max(↖, ↑, ←)              max(0, ↖, ↑, ←)
+
+Inicio traceback  Esquina (n,m)              Celda con valor máximo
+
+Fin traceback     Celda (0,0)                Celda con valor 0
+
+Resultado         Toda X alineada            Mejor región en común
+                  contra toda Y              entre cualquier parte de X e Y
+```
+
+---
+
+### Múltiples alineamientos óptimos
+
+A veces al llenar la matriz, dos o más opciones de la recurrencia dan exactamente el mismo valor en la misma celda. Ejemplo:
+
+```
+F(i-1, j-1) + s(xᵢ, yⱼ) = F(i-1, j) + gap_penalty
+```
+
+En ese caso, hay un **empate**: el algoritmo anota **ambas flechas** en la matriz de traceback.
+
+Cuando hacés el traceback y llegás a una celda con dos flechas, el camino se **bifurca**: podés seguir por cualquiera de los dos caminos, y cada uno va a darte un alineamiento diferente, pero **con el mismo score total**.
+
+**Ejemplo conceptual:**
+```
+X:  A A T
+Y:  A T
+
+Con gap = -1, match = +1, mismatch = -1:
+
+Alineamiento 1:   A A T      Score: +1 (A-A) + (-1)(gap) + +1(T-T) = +1
+                  A - T
+
+Alineamiento 2:   A A T      Score: (-1)(gap) + +1(A-A) + +1(T-T) = +1
+                  - A T
+```
+
+Para encontrarlos todos:
+1. Llenás la matriz de scores normalmente.
+2. En el traceback, cada vez que hay empate → bifurcás el camino.
+3. Cada camino completo es un alineamiento óptimo distinto.
+
+### Cómo leer el alineamiento desde el traceback
+
+| Movimiento en el traceback | Columna del alineamiento |
+|---|---|
+| Diagonal ↖ | xᵢ alineado con yⱼ (match si son iguales, mismatch si difieren) |
+| Arriba ↑ | xᵢ alineado con `-` (gap en la secuencia horizontal Y) |
+| Izquierda ← | `-` alineado con yⱼ (gap en la secuencia vertical X) |
+
+### Complejidad computacional
+
+Tanto NW como SW tienen:
+- **Tiempo:** O(n × m) — se calcula cada celda de la matriz una sola vez.
+- **Espacio:** O(n × m) — hay que guardar toda la matriz para el traceback.
+
+Para secuencias de n = m = 1000, eso es ~1.000.000 operaciones. Para secuencias genómicas de millones de bases, se usan variantes heurísticas como BLAST.
+
+### Resumen visual del flujo completo
+
+```
+Tengo dos secuencias
+        ↓
+¿Son similares en largo y quiero alinear todo?
+    ├─ SÍ → Needleman-Wunsch (global)
+    └─ NO → Smith-Waterman (local)
+        ↓
+Elijo función de scoring:
+  · DNA: match/mismatch simples + penalización por gap
+  · Proteínas: matriz de sustitución (BLOSUM 62 por default)
+        ↓
+Elijo tipo de gap:
+  · Gap lineal: W(k) = d × k  (simple, no diferencia 1 gap largo de muchos cortos)
+  · Gap affine: W(k) = a + b×k  (realista: abrir es caro, extender es barato)
+        ↓
+Lleno la matriz F de programación dinámica
+  → guardo también la matriz de traceback (de dónde viene cada celda)
+        ↓
+Traceback:
+  NW: empiezo en (n,m), termino en (0,0)
+  SW: empiezo en el máximo global, termino en una celda con valor 0
+        ↓
+Leo el alineamiento:
+  diagonal ↖ → match / mismatch
+  arriba   ↑ → gap en secuencia horizontal
+  izquierda← → gap en secuencia vertical
+        ↓
+¿Hay empates en el traceback?
+  SÍ → múltiples alineamientos óptimos (mismo score, distinta forma)
+  NO → un único alineamiento óptimo
+```
+
+---
+
+## Clase 3 — BLAST y Alineamiento Múltiple
+
+### La intuición fundamental: buscar una secuencia es como buscar en un libro gigante
+
+Antes de ver el algoritmo, hay que entender *por qué* existe BLAST y qué problema conceptual resuelve.
+
+Supongamos que tenemos un fragmento de 50–100 aminoácidos de una proteína que acabamos de obtener experimentalmente y queremos saber qué proteína es. La base de datos tiene 10 millones de proteínas. No sabemos el nombre, solo tenemos la secuencia. Entonces necesitamos buscar en el **campo secuencia**.
+
+Cuando buscamos "hemoglobin" en el campo nombre de una BD, la base de datos consulta un **índice** (una lista ordenada, como el índice de un libro) y encuentra las entradas que coinciden. Eso es rápido. El problema con las secuencias es que no puedo indexarlas como texto, porque lo que me interesa no es la igualdad exacta sino la **similitud**. Necesito comparar mi secuencia contra cada secuencia del campo secuencia usando **alineamiento**, y eso es O(n·m) por par → inviable para 10M de registros.
+
+> **Analogía:** es como si en Google quisieras buscar una *frase* en todos los sitios web, pero la frase puede tener pequeñas variaciones. Google no puede revisar cada página; tiene que tener pre-indexado algo más fino.
+
+La solución de BLAST: indexar las secuencias de la BD **en trozos pequeños (words)**, buscar esos trozos exactos en el índice, y solo desde esos hits exactos extender el alineamiento. Transforma O(n·m) por registro a casi O(m) en total.
+
+---
+
+### Los 4 pasos de BLAST con visualización detallada
+
+#### Paso 1 — Construcción de la word list (fragmentar la query)
+
+La query se fragmenta en **words** de tamaño fijo (word size w=3 para proteínas, w=11 para nucleótidos).
+
+```
+Query de 13 aminoácidos:
+  A  L  V  G  T  T  Y  H  H  V  D  R  R
+
+Words generadas (w=3):
+  pos 1: ALV
+  pos 2: LVG
+  pos 3: VGT
+  pos 4: GTT
+  pos 5: TTY
+  pos 6: TYH
+  pos 7: YHH
+  pos 8: HHV
+  pos 9: HVD
+  pos 10: VDR
+  pos 11: DRR
+  → 11 words para una query de largo 13 (m−w+1)
+```
+
+Para proteínas, BLAST además genera **vecinas** de cada word: todas las secuencias de largo w cuyo score BLOSUM62 contra la word original sea mayor que un umbral T (típicamente T=11).
+
+```
+Vecinas de "ALV" (score ≥ 11 con BLOSUM62):
+  ALV, ALI, ALA, ALM, AIV, AVI, ...
+  → unas ~50 vecinas para w=3, T=11
+```
+
+**Por qué tiene sentido:** si la proteína buscada tiene LEU donde la query tiene VAL (cambio conservativo), la word "ALI" pega en el índice donde "ALV" no hubiera pegado. El umbral T controla el balance: T alto → lista corta → más rápido pero menos sensible; T bajo → más lento pero detecta más homólogos distantes.
+
+#### Paso 2 — Búsqueda de hits en el índice pre-construido
+
+La BD tiene pre-indexadas todas sus secuencias en words. El índice es una tabla que, para cada posible word de largo w (20³ = 8.000 entradas para w=3), lista todos los registros que la contienen y en qué posiciones.
+
+```
+ÍNDICE PRE-CONSTRUIDO (fragmento):
+
+Word  | Registro | Posición en registro
+------|----------|---------------------
+ALI   | reg_0472 | pos 34, 118
+ALI   | reg_1203 | pos 7
+ALV   | reg_0472 | pos 35
+ALV   | reg_5503 | pos 12
+```
+
+BLAST busca cada word de la word list en ese índice → obtiene hits **(registro, posición_en_BD, posición_en_query)**.
+
+> **Clave:** este índice se calcula **una sola vez** (cuando se actualiza la BD) y se reutiliza en cada búsqueda. Por eso una búsqueda de 300 aa contra 1M de registros tarda solo 10–30 segundos.
+
+Los registros que aparecen repetidamente para muchas words son candidatos a contener una región similar a la query.
+
+#### Paso 3 — Extensión sin gaps (Ungapped Extension)
+
+Los hits se posicionan usando sus coordenadas para armar un dot-plot interno. Los hits en la misma diagonal (posición_BD − posición_query = constante) pertenecen al mismo alineamiento potencial. BLAST extiende a izquierda y derecha desde cada hit **sin introducir gaps**, sumando scores BLOSUM62:
+
+```
+← extiende       HIT      extiende →
+query: ...  L  V [A  L  V] G  T  T  ...
+BD:    ...  L  V [A  L  L] G  T  T  ...
+           acumula score mientras los residuos sean parecidos
+```
+
+La extensión se **detiene** cuando el score acumulado cae por debajo de un umbral X₀. La región resultante con score ≥ S es un **HSP (High-Scoring Segment Pair)**.
+
+```
+Score acumulado durante la extensión:
+  4  8  12  16  14  12  10  8  3  [cae bajo umbral: CORTE]
+              ↑ punto máximo del HSP
+```
+
+**Por qué sin gaps primero:** hacer Smith-Waterman completo para cada hit sería demasiado costoso. La extensión sin gaps es O(largo del HSP) y filtra la enorme mayoría del ruido.
+
+#### Paso 4 — Extensión con gaps y cálculo de E-value
+
+Solo para los HSPs que superaron el umbral S, BLAST hace un **alineamiento local tipo Smith-Waterman** (ahora con gaps) centrado en el HSP.
+
+```
+ANTES (extensión sin gaps):
+  query: A L V G T T Y H
+  BD:    A L I G T T Y H
+
+DESPUÉS (con gaps):
+  query: A L V G T - T Y H
+         | | . | |   | | |
+  BD:    A L I G T K T Y H
+         ↑ gap insertado en la query
+```
+
+**Nota sobre múltiples alineamientos por registro:** BLAST es *local*, puede reportar **más de un alineamiento por el mismo registro** si hay dos regiones de similitud separadas por una región mala. BLAST = Basic **Local** Alignment Search Tool.
+
+---
+
+### El E-value: qué significa realmente
+
+**El recorrido conceptual:**
+
+1. **Score crudo (raw score):** suma de valores BLOSUM62 + penalidades de gap. No está normalizado.
+
+2. **Bit-score:** normalización del score crudo con los parámetros λ y K de la distribución estadística. Permite comparar alineamientos de distinto largo.
+
+3. **P-value:** probabilidad de obtener ese score o mayor por azar, dado el modelo estadístico. Problema: cuando busco en una BD con millones de registros, hago millones de comparaciones. Si el p-value es 0.01 y hay 1M de registros, obtengo 10.000 hits por azar.
+
+4. **E-value:** corrección del p-value por el tamaño de la BD. Es el **número esperado de hits con ese score o mayor que obtendrías por azar** en una BD de ese tamaño.
+
+```
+Fórmula: E = K · m · N · e^(−λS*)
+
+  m  = largo de la query (residuos)
+  N  = tamaño total de la BD (número total de residuos)
+  S* = bit-score
+  K, λ = constantes dependientes de la matriz y parámetros de gap
+```
+
+```
+Interpretación práctica:
+
+  E = 1e-50  →  imposible por azar → hit muy significativo
+  E = 1e-5   →  1 hit por azar cada 100.000 búsquedas → bueno
+  E = 0.01   →  1 hit por azar cada 100 búsquedas → aceptable para homólogos distantes
+  E = 1      →  1 hit por azar en ESTA búsqueda → dudoso
+  E = 10     →  10 hits por azar → ruido, descartar
+```
+
+**Por qué el E-value depende del tamaño de la BD:**
+
+El mismo alineamiento con el mismo score tendrá distinto E-value en BDs distintas:
+
+```
+  BD pequeña (N = 10^6 residuos):  E = K · m · 10^6 · e^(-λS)
+  BD grande  (N = 10^9 residuos):  E = K · m · 10^9 · e^(-λS)  ← 1000 veces mayor (peor)
+```
+
+**Consecuencia práctica:** si restringís la búsqueda de BLAST a un organismo o taxón, la BD efectiva es más chica → el mismo hit tendrá E-value más favorable (menos ruido). Restricción de BD ahorra tiempo (menos registros) y mejora estadística (menos ruido).
+
+**Cuándo usar cada métrica:**
+- Score crudo: solo para analizar la matriz de sustitución.
+- Bitscore: para comparar alineamientos entre sí (sin búsqueda en BD).
+- E-value: siempre cuando se hace una búsqueda en BD y querés saber si el hit es significativo.
+
+---
+
+### Blast2Sequences vs búsqueda en base de datos
+
+| | Búsqueda en BD | Blast2Sequences |
+|---|---|---|
+| **Qué hace** | Compara 1 query vs millones de secuencias | Compara 2 secuencias específicas entre sí |
+| **Para qué** | Descubrir homólogos desconocidos | Comparar proteínas ya elegidas |
+| **E-value** | Tiene sentido estadístico pleno | No tiene el mismo sentido (BD de 1 secuencia) |
+| **Análogo** | Búsqueda en Google | Comparar dos documentos específicos |
+
+Blast2Sequences es equivalente a hacer un alineamiento tipo Smith-Waterman entre dos secuencias que ya elegiste.
+
+---
+
+### PSI-BLAST: BLAST iterativo con matriz posición-específica
+
+#### El problema que resuelve
+
+BLAST estándar usa BLOSUM62 igual en todas las posiciones. Pero en una familia de proteínas hay posiciones muy conservadas (sitio activo, contacto con ligando) y posiciones variables (superficies expuestas). PSI-BLAST aprende esa heterogeneidad y es más sensible.
+
+```
+Posición 44 del MSA (catálisis):
+  Seq1: D     Seq2: D     Seq3: D     Seq4: D
+  → 100% conservada. BLOSUM62 da el mismo score a D→N aquí que en otra posición.
+  → PSI-BLAST hace ese cambio MUY costoso en esta posición.
+
+Posición 97 del MSA (loop expuesto):
+  Seq1: A     Seq2: S     Seq3: T     Seq4: G
+  → Muy variable. PSI-BLAST hace cualquier cambio BARATO aquí.
+```
+
+#### El ciclo iterativo ronda 1 → PSSM → ronda 2
+
+```
+RONDA 1:
+  query → BLAST con BLOSUM62 genérica
+        → hits con E < umbral (default 0.001)
+        → conjunto inicial de homólogos (alta confianza)
+
+CONSTRUCCIÓN DEL MSA:
+  Alinear todas las secuencias homólogas entre sí
+
+       pos1  pos2  pos3  pos4  ...
+  seq1:  A     C     D     K
+  seq2:  A     -     D     K
+  seq3:  S     C     D     R
+  seq4:  A     C     E     K
+
+CONSTRUCCIÓN DE LA PSSM:
+  Para cada posición i y cada aminoácido a:
+    PSSM[i][a] = log(frec_observada(a en columna i) / frec_esperada_azar(a))
+
+  → Posición conservada: score alto para el aa correcto, muy negativo para otros
+  → Posición variable:   scores similares para muchos aminoácidos
+
+  Resultado: UNA MATRIZ DIFERENTE por posición (no una sola BLOSUM62 global)
+
+            A    C    D    E    F    G    ...
+  pos 1  [ +2   -3   -2   -2   -4   +1   ...]  ← A y S comunes
+  pos 2  [ -2  +4   -3   -3   -5   -3   ...]  ← C muy conservada
+  pos 3  [ -3   -4   +5   -1   -5   -4   ...]  ← D muy conservada
+
+RONDA 2:
+  query → buscar en BD con PSSM[i][a] en lugar de BLOSUM62
+        → detecta homólogos remotos que ronda 1 perdió
+        → agregar nuevos hits al MSA (si E < umbral)
+        → recalcular PSSM → RONDA 3, RONDA 4, ... hasta convergencia
+```
+
+#### El peligro del PSI-BLAST drift
+
+Si un **falso positivo** entra al MSA en alguna ronda, contamina la PSSM → en la siguiente ronda la PSSM distorsionada encuentra más proteínas parecidas al FP → entran más FP → la PSSM se desvía progresivamente de la familia original.
+
+```
+Ronda 1: query ─PSSM₁─→ {seqs familia + 1 FP}
+                                              ↓
+Ronda 2:       ─PSSM₂─→ {seqs familia + 5 FP}   ← PSSM contaminada
+                                              ↓
+Ronda 3:       ─PSSM₃─→ {seqs alejadas + muchos FP} ← "drift"
+```
+
+**Cómo evitarlo:** umbral más estricto (E < 1e-5), revisión manual de cada ronda, no hacer más rondas de las necesarias (2–3 suele ser suficiente).
+
+> **Lo que importa retener:** la PSSM es una **matriz diferente por posición** (no una sola BLOSUM62 global). Eso es exactamente lo que se llama **perfil** y es el punto de partida para los HMMs de la clase siguiente.
+
+---
+
+### Tipos de BLAST: razonamiento biológico de cuándo usar cada uno
+
+```
+              QUERY                    BD
+blastp:       proteína         →       proteínas
+blastn:       nucleótidos      →       nucleótidos
+blastx:       nucl (6 marcos)  →       proteínas
+tblastn:      proteína         →       nucl (6 marcos)
+tblastx:      nucl (6 marcos)  →       nucl (6 marcos)
+```
+
+**blastp:** el uso más común. Buscás homólogos de una proteína conocida. El más sensible para detectar homología proteica porque compara directamente residuos.
+
+**blastn:** útil para buscar secuencias genómicas muy parecidas (mismo gen en especie muy cercana). Menos sensible para homólogos distantes porque el alfabeto de solo 4 letras produce muchas coincidencias por azar, y los nucleótidos divergen más rápido que las proteínas.
+
+**blastx:** tenés una secuencia de ADN nueva (fragmento de PCR, contig de novo) y querés saber si codifica alguna proteína conocida. BLAST traduce la query en **6 marcos de lectura** y busca cada traducción en la BD de proteínas.
+
+```
+Marco +1:  ATG GCT TTA → M  A  L
+Marco +2:   TGG CTT TAA → W  L  *
+Marco +3:    GGC TTT AA → G  F  ...
+Marco −1, −2, −3: hebra complementaria inversa en 3 marcos
+```
+
+**tblastn:** tenés una proteína conocida y querés buscarla en un genoma sin anotar. La BD de nucleótidos se traduce on-the-fly en 6 marcos y se compara con la query proteica. Imprescindible cuando el genoma target no tiene proteínas anotadas todavía.
+
+**tblastx:** compara dos genomas no anotados entre sí. Ambos, query y BD, se traducen en 6 marcos. Muy costoso computacionalmente, se usa raramente.
+
+**Regla de sensibilidad (detectar homólogos remotos):**
+```
+blastp > blastx > tblastn
+```
+Por eso cuando tenés secuencia de ADN pero querés encontrar proteínas homólogas, usás blastx: la comparación a nivel proteico (20 letras) es mucho más informativa que la de nucleótidos (4 letras), y los cambios sinónimos del ADN no oscurecen la señal.
+
+---
+
+
+### Por qué el MSA es fundamental
+
+Un alineamiento de pares nos dice si dos secuencias son similares. Para entender una **familia de proteínas** necesitamos ver muchas secuencias juntas. El MSA permite:
+
+1. **Identificar posiciones conservadas:** si en una columna del MSA todas las secuencias tienen el mismo aminoácido, esa posición está bajo presión selectiva → probablemente funcional (sitio activo, contacto con ligando).
+
+2. **Construir perfiles (PSSM):** el MSA es la base para construir matrices sitio-específicas usadas en PSI-BLAST y HMMs.
+
+3. **Construir árboles filogenéticos:** las distancias evolutivas entre pares se calculan a partir del MSA y permiten reconstruir relaciones entre organismos.
+
+4. **Transferir anotación funcional:** si una posición está conservada en la familia y en una proteína conocida es el sitio catalítico, podés inferir que esa posición es funcional en todas las demás.
+
+5. **Entrada para HMMs:** los Hidden Markov Models de secuencia (Clase 4) se construyen a partir de un MSA y permiten búsquedas mucho más sensibles que BLAST.
+
+**El problema de escala:** el MSA óptimo por programación dinámica tiene complejidad O(L^N) donde L es el largo y N el número de secuencias. Para N=10, L=300: ~10^24 operaciones → inviable. Se necesitan heurísticas.
+
+---
+
+### CLUSTALW: el algoritmo progresivo paso a paso con razonamiento
+
+CLUSTALW es el algoritmo de MSA más clásico. Es **progresivo**: en lugar de alinear todo junto, agrega secuencias de a una (o grupos), siguiendo un árbol de similitud.
+
+**Razonamiento detrás:** si dos secuencias son muy similares, su alineamiento va a ser casi perfecto desde el inicio. Tiene sentido empezar por lo que sabemos bien (pares más similares) y construir hacia lo más incierto (pares más distantes).
+
+```
+Analogía: es como ordenar cronológicamente fotos → empezás agrupando
+las del mismo año y luego decidís cómo encajan los grupos entre sí.
+```
+
+#### Paso 1 — Alineamiento todos-contra-todos y matriz de similitud
+
+Se alinean todos los pares de secuencias (Smith-Waterman o similar) y se calcula el bitscore de cada par. Con N secuencias hay N(N−1)/2 pares.
+
+```
+Para 4 secuencias: 4×3/2 = 6 comparaciones
+Para 8 secuencias: 8×7/2 = 28 comparaciones
+```
+
+Resultado: matriz de scores (ejemplo):
+
+```
+MATRIZ DE SCORES (bitscore):
+        Prot1   Prot2   Prot3   Prot4
+Prot1     —      18      72      15
+Prot2    18       —      14      81
+Prot3    72      14       —      11
+Prot4    15      81      11       —
+
+Pares más similares: (P2, P4) = 81 y (P1, P3) = 72
+Pares más distantes: (P3, P4) = 11
+```
+
+#### Paso 2 — Construcción del árbol guía (Neighbor-Joining)
+
+A partir de la matriz de distancias se construye un árbol que une los pares más cercanos primero:
+
+```
+ÁRBOL GUÍA:
+
+        ┌─── Prot2
+   ┌────┤                  ← nodo A: los más similares (P2+P4, score 81)
+   │    └─── Prot4
+───┤
+   │    ┌─── Prot1
+   └────┤                  ← nodo B: segundo par más similar (P1+P3, score 72)
+        └─── Prot3
+
+Los dos nodos se unen por el mayor score inter-bloque = score(P2,P1) = 18.
+```
+
+#### Paso 3 — Alineamiento progresivo siguiendo el árbol
+
+**Regla fundamental: una vez hecho un alineamiento parcial, NO SE TOCA.**
+
+```
+Iteración 1: Alinear Prot2 con Prot4 (par más similar, score=81):
+  Prot2: M A I K - T L
+  Prot4: M A I K G T L   ← gap insertado en Prot2 pos 5. FIJO.
+
+Iteración 2: Alinear Prot1 con Prot3 (siguiente par, score=72):
+  Prot1: M - V K T L
+  Prot3: M C V K T L     ← gap en Prot1 pos 2. FIJO.
+
+Iteración 3: Alinear bloque {Prot2, Prot4} contra bloque {Prot1, Prot3}
+  → Se alinea el representante de mayor score inter-bloque: P2 vs P1 (score=18)
+  → Los gaps que recibe P2 se propagan a P4 (misma fila del bloque A)
+  → Los gaps que recibe P1 se propagan a P3 (misma fila del bloque B)
+
+MSA FINAL:
+  Prot2: M  A  I  K  -  T  L
+  Prot4: M  A  I  K  G  T  L
+  Prot1: M  -  -  K  -  T  L
+  Prot3: M  C  -  K  -  T  L
+         c1 c2 c3 c4 c5 c6 c7
+```
+
+**¿Por qué el alineamiento no se toca?** El algoritmo es greedy (avaro): toma la mejor decisión local en cada paso pero no tiene visión global. Una vez tomada una decisión, no la revisa. Esto hace posible terminar en tiempo razonable, pero los errores tempranos se propagan.
+
+---
+
+### Score de un bloque vs otro: promedio de pares
+
+Para decidir si una secuencia nueva se pega a un bloque existente o forma una nueva rama, se compara el score de la secuencia contra cada miembro del bloque y se usa el **promedio**:
+
+```
+Ejemplo: tengo bloque {1, 2, 3, 4} y secuencia 7. ¿La 7 se une al bloque o a la 9?
+
+  Score(7 vs 9) = 14
+
+  Score(7 vs bloque {1,2,3,4}):
+    Score(7,1) = 3
+    Score(7,2) = 5
+    Score(7,3) = 2
+    Score(7,4) = 14
+    Promedio = (3+5+2+14)/4 = 6
+
+  6 < 14  →  la 7 se une a la 9 (mayor score = más similar = une primero)
+```
+
+---
+
+### SP score (Sum of Pairs): cálculo detallado con ejemplo
+
+El SP score es la métrica estándar para evaluar la calidad de un MSA. Para cada columna del MSA, suma los scores entre todos los pares de caracteres en esa columna. Luego suma todas las columnas.
+
+```
+SP = Σ_columnas Σ_(pares i<j) score(seq_i[col], seq_j[col])
+```
+
+**Reglas:**
+- gap con residuo → penalidad normal (gap penalty)
+- **gap con gap → contribución = 0** (no penaliza, por convención)
+- dos residuos iguales → match score
+- dos residuos distintos → mismatch score
+
+**Ejemplo con scoring simple (match=+1, mismatch=0, gap−residuo=−1, gap−gap=0), 3 secuencias, 4 columnas:**
+
+```
+       col1  col2  col3  col4
+Seq1:   A     C     -     T
+Seq2:   A     C     G     T
+Seq3:   A     T     G     T
+
+Pares: (1,2), (1,3), (2,3) → 3 pares por columna
+
+COLUMNA 1: A, A, A
+  (1,2): score(A,A) = +1
+  (1,3): score(A,A) = +1
+  (2,3): score(A,A) = +1
+  Subtotal = 3
+
+COLUMNA 2: C, C, T
+  (1,2): score(C,C) = +1
+  (1,3): score(C,T) = mismatch = 0
+  (2,3): score(C,T) = 0
+  Subtotal = 1
+
+COLUMNA 3: -, G, G
+  (1,2): score(-,G) = gap−residuo = −1
+  (1,3): score(-,G) = −1
+  (2,3): score(G,G) = match = +1
+  Subtotal = −1
+
+COLUMNA 4: T, T, T
+  (1,2): score(T,T) = +1
+  (1,3): score(T,T) = +1
+  (2,3): score(T,T) = +1
+  Subtotal = 3
+
+SP TOTAL = 3 + 1 + (−1) + 3 = 6
+```
+
+**Para 4 secuencias**: SP_total = suma de los 6 pares posibles = S(1,2) + S(1,3) + S(1,4) + S(2,3) + S(2,4) + S(3,4). Se calcula columna a columna sumando todos los pares.
+
+---
+
+### La limitación crítica del enfoque progresivo
+
+**El problema:**
+
+```
+SITUACIÓN:
+  Tenés 5 secuencias: A, B, C, D, E
+  A y B son muy similares → se alinean primero → FIJO
+
+  Supongamos que cuando se considera C, D, E, resulta que había que
+  poner un gap en posición 7 del alineamiento (A,B).
+  → Pero ese alineamiento ya no se puede modificar.
+  → El error se propaga a todo el MSA final.
+```
+
+**Consecuencias:**
+- Si las secuencias más similares tienen alguna peculiaridad no representativa de la familia, ese ruido se propaga.
+- Para secuencias muy divergentes (identidad < 20%) CLUSTALW da resultados pobres.
+
+**Soluciones parciales:**
+- Refinamiento por SP score.
+- Métodos más avanzados: MUSCLE, MAFFT, T-Coffee.
+- Métodos probabilísticos con HMM: consideran toda la información global (Clase 4).
+
+---
+
+### El hilo conductor completo (como lo presentó el profe)
+
+El profe enmarcó esto como una clase de **transición e integración**. El flujo conceptual es:
+
+```
+Bases de datos (registros, campos, índices)
+    ↓ ¿cómo busco por secuencia en vez de por nombre?
+BLAST (indexar el campo secuencia con words → búsqueda rápida)
+    ↓ los hits de BLAST son secuencias homólogas
+MSA (alinear múltiples secuencias con CLUSTALW)
+    ↓ el MSA revela conservación posición por posición
+PSSM (matriz sitio-específica = una matriz por posición del MSA)
+    ↓ usar la PSSM para buscar en vez de BLOSUM62 genérica
+PSI-BLAST (BLAST iterativo con PSSM → detecta homólogos remotos)
+    ↓
+Perfiles / HMM (Clase 4: modelo probabilístico del MSA)
+```
+
+Cada paso es la *entrada* del siguiente. Entender este flujo es esencial para no ver estos temas como capítulos aislados.
+
+---
+
+## Clase 4 — Bases de Datos Secundarias — HMM, PROSITE, InterPro
 
 ### El problema: una BD primaria no es un clasificador
 
-Las BDs primarias (§5) guardan registros individuales: una secuencia, un experimento, una estructura. Cuando yo tengo una proteína nueva y quiero saber a qué familia pertenece, puedo hacer BLAST contra Swiss-Prot y ver qué proteínas conocidas se parecen. Pero hay un límite: dos proteínas de la misma familia pueden tener menos del 30% de identidad de secuencia (zona twilight) y BLAST las pierde.
+Las BDs primarias (Clase 1) guardan registros individuales: una secuencia, un experimento, una estructura. Cuando yo tengo una proteína nueva y quiero saber a qué familia pertenece, puedo hacer BLAST contra Swiss-Prot y ver qué proteínas conocidas se parecen. Pero hay un límite: dos proteínas de la misma familia pueden tener menos del 30% de identidad de secuencia (zona twilight) y BLAST las pierde.
 
 La diferencia conceptual fundamental es esta:
 
@@ -732,118 +1705,7 @@ InterPro (EBI) consolida todas las BDs de dominios/familias en una sola entrada 
 
 ---
 
-## 7. Matrices PAM vs BLOSUM
-
-### Introducción: ¿por qué no usar match=1 / mismatch=−1?
-
-En los algoritmos NW/SW necesitamos asignar un score a cada par de aminoácidos alineados. La opción más simple sería match=1 / mismatch=−1, pero eso ignora la biología: no es igual que una Leucina mute a Isoleucina (ambas hidrófobas, muy tolerado evolutivamente) que mute a Arginina (cargada positiva, casi nunca ocurre). Las **matrices de sustitución** codifican esta información: para cada par de aminoácidos dicen cuánto "vale" ese alineamiento basándose en qué tan frecuentemente ocurre esa sustitución en la evolución real.
-
-La fórmula general es: `score(a,b) = log[ P(a y b alineados) / P(a y b por azar) ]`. Si el par ocurre más seguido de lo esperado al azar → score positivo. Si ocurre menos → score negativo.
-
-Hay dos familias de matrices construidas con distintas filosofías:
-
-| | PAM | BLOSUM |
-|--|-----|--------|
-| **Construida con** | Alineamientos globales de secuencias ≥85% id | Bloques conservados locales sin gaps |
-| **Número** | ↑ = mayor distancia evolutiva | ↑ = secuencias más similares usadas |
-| **Default** | — | **BLOSUM62** |
-| Para secuencias similares | PAM120 | BLOSUM80 |
-| Para secuencias divergentes | PAM250 | BLOSUM45 |
-
-> **Regla de oro:** BLOSUM62 para la mayoría de búsquedas. Para comparaciones muy divergentes → BLOSUM45 o PAM250.
->
-> **Intuición BLOSUM:** el número = umbral de identidad de los bloques. BLOSUM80 fue construida con bloques de secuencias ≥80% idénticas → puntúa alto las sustituciones muy conservadas, penaliza fuerte cualquier cambio. BLOSUM45 fue construida con secuencias más divergentes → más permisiva.
-
-### ¿Qué hace positivo un score BLOSUM62?
-
-Si dos aminoácidos comparten el **mismo grupo fisicoquímico** (ver diagrama de Venn en sección 8), su score en BLOSUM62 es positivo. Cuantos más grupos comparten → score más alto.
-
-| Par | Score BLOSUM62 | Razón |
-|-----|----------------|-------|
-| L ↔ I | +2 | Aliphatic + Hydrophobic |
-| D ↔ E | +2 | Ambos ácidos cargados negativamente |
-| K ↔ R | +2 | Ambos básicos cargados positivamente |
-| F ↔ Y | +3 | Ambos aromáticos |
-| V ↔ I | +3 | Aliphatic + Hydrophobic |
-| S ↔ T | +1 | Ambos polares pequeños con OH |
-| P ↔ L | −3 | Pro rompe estructura; grupos distintos |
-| P ↔ W | −4 | Pro rompe estructura; grupos muy distintos |
-| P ↔ P | +7 | Auto-match |
-
----
-
-## 8. Aminoácidos
-
-### Introducción: por qué importan las propiedades fisicoquímicas
-
-En bioinformática, los aminoácidos no son solo letras del alfabeto. Sus propiedades fisicoquímicas determinan qué sustituciones son toleradas evolutivamente (y por lo tanto qué scores tienen en BLOSUM), qué residuos aparecen en sitios activos, y qué motivos de secuencia son funcionalmente relevantes. Esta sección es referencia rápida para responder preguntas como "¿por qué Pro no puede estar en el motivo N-{P}-[ST]?" o "¿por qué Cys aparece en puentes disulfuro?".
-
-### Los 20 aminoácidos: códigos y propiedades
-
-| 1 letra | 3 letras | Nombre | Grupo | Nota especial |
-|:-------:|:--------:|--------|-------|---------------|
-| **A** | Ala | Alanina | Hidrofóbico pequeño | El más frecuente en proteínas |
-| **R** | Arg | Arginina | Básico (+) | pKa ~12.5; carga + más estable a pH 7 |
-| **N** | Asn | Asparagina | Polar sin carga | Sitio de N-glicosilación (motivo N-X-S/T) |
-| **D** | Asp | Ácido aspártico | Ácido (−) | pKa ~3.9; cadena corta |
-| **C** | Cys | Cisteína | Polar / hidrofóbico | Puentes disulfuro; sitios activos nucleofílicos; 2do más raro |
-| **Q** | Gln | Glutamina | Polar sin carga | N↔Q y D↔E son sustituciones conservativas |
-| **E** | Glu | Ácido glutámico | Ácido (−) | pKa ~4.1; un CH₂ más que Asp |
-| **G** | Gly | Glicina | Tiny / flexible | Sin cadena lateral; máxima flexibilidad; aparece en loops y giros |
-| **H** | His | Histidina | Básico / polar | **Único con pKa ~6** → catálisis ácido-base a pH fisiológico (tríada catalítica) |
-| **I** | Ile | Isoleucina | Aliphatic | Isómero de Leu; L↔I muy conservativa |
-| **L** | Leu | Leucina | Aliphatic | El aminoácido más frecuente |
-| **K** | Lys | Lisina | Básico (+) | pKa ~10.5; ubiquitinación; interacciona con DNA |
-| **M** | Met | Metionina | Hidrofóbico | Codón de inicio (AUG) |
-| **F** | Phe | Fenilalanina | Aromático | Núcleo hidrofóbico; absorbe UV a 280nm levemente |
-| **P** | Pro | Prolina | Especial (rígido) | **Rompe hélices y hojas β. Anillo unido al N backbone → no dona H. No va en X de N-glicosilación.** |
-| **S** | Ser | Serina | Polar pequeño | Fosforilación; O-glicosilación |
-| **T** | Thr | Treonina | Polar | Fosforilación; posición S/T en motivo N-glicosilación |
-| **W** | Trp | Triptófano | Aromático | **El más raro (~1%)**; casi siempre crítico funcionalmente; absorbe fuerte a 280nm |
-| **Y** | Tyr | Tirosina | Aromático / polar | Fosforilación; absorbe a 280nm |
-| **V** | Val | Valina | Aliphatic | Voluminoso; volúmenes: V < L = I |
-
-### Clasificación por grupos fisicoquímicos
-
-```
-TINY:      G  A  C  S
-SMALL:     G  A  C  S  N  D  T  P
-ALIPHATIC: I  V  L
-AROMATIC:  F  Y  W
-HYDROPHOBIC (teal): I  V  L  M  A  G  C  T  F  Y  W
-POLAR (blue):       S  T  C  N  Q  D  E  K  R  H
-CHARGED (yellow):   D  E  K  R  H
-POSITIVE (red):     K  R  H
-NEGATIVE / ÁCIDOS:  D  E
-```
-
-> **Regla:** si dos aa comparten grupo → sustitución conservativa → BLOSUM62 positivo.
-> L e I comparten ALIPHATIC + HYDROPHOBIC → score alto.
-> K y E tienen cargas opuestas → score negativo.
-
-### Aminoácidos especiales (importantes para el parcial)
-
-| aa | ¿Por qué es especial? |
-|----|-----------------------|
-| **G** | Sin cadena → máxima flexibilidad; aparece en turns y loops |
-| **P** | Anillo con N backbone → rompe estructuras secundarias; fuerza kink; **no va en posición X de N-glicosilación** |
-| **C** | Tiol → puentes disulfuro; sitios activos; el 2do más raro |
-| **W** | El más raro (~1%); casi siempre funcionalmente crítico; mayor absorbancia a 280nm |
-| **H** | Único pKa ~6 → catálisis ácido-base a pH 7 (tríada catalítica: Ser-His-Asp) |
-
-### Modificaciones post-traduccionales
-
-| Modificación | aa | Función |
-|-------------|-----|---------|
-| **Fosforilación** | S, T, Y | Señalización; activación/inactivación enzimática |
-| **N-glicosilación** | N (motivo N-{P}-[ST]) | Plegamiento, estabilidad, reconocimiento celular |
-| **Ubiquitinación** | K | Degradación por proteasoma |
-| **Puente disulfuro** | C-C | Estabilidad en proteínas extracelulares |
-| **Acetilación** | K (histonas), Met N-terminal | Regulación génica |
-
----
-
-## 9. NGS, Ensamblado, Genómica Humana
+## Clase 5 — NGS y Ensamblado de Genomas
 
 ### Introducción: el problema de leer el ADN
 
@@ -933,16 +1795,135 @@ La PCR es la base del paso de amplificación clonal en las tecnologías de 2ª g
 
 ### Preparación de librería — paso previo a todos los NGS
 
-Antes de entrar al secuenciador, el ADN debe acondicionarse:
+El ADN genómico crudo no puede entrar directamente al secuenciador: es demasiado largo, no tiene puntos de anclaje y no se puede distinguir un fragmento de otro. La preparación de librería lo transforma en una mezcla de fragmentos cortos, etiquetados y listos para ser leídos.
+
+---
+
+#### Paso 1 — Fragmentación
+
+El genoma humano tiene ~3 000 millones de pares de bases. Las tecnologías de 2ª generación leen ~100–600 pb por lectura, así que primero hay que romper el ADN en pedacitos de ese tamaño.
+
+**Fragmentación mecánica (sonicación):**
+```
+Genoma completo:
+═══════════════════════════════════════════════════════
+           ↓ ultrasonido (ondas de presión)
+    ════   ════════   ═══   ════════   ═══   ════
+    ~200pb   ~350pb   ~150pb  ~400pb   ~180pb  ~300pb
+```
+Las ondas de sonido rompen el ADN al azar → fragmentos de tamaño variable. Luego se selecciona el rango de tamaño deseado con geles o beads (se descartan los demasiado cortos o largos).
+
+**Fragmentación enzimática:** enzimas de restricción o transposasas cortan en sitios específicos o semi-aleatorios. Más reproducible que la sonicación pero introduce un sesgo hacia los sitios de corte de la enzima.
+
+---
+
+#### Paso 2 — Agregar adaptadores
+
+Los fragmentos recién rotos tienen extremos irregulares y no tienen nada que los identifique. Se les ligan adaptadores: **secuencias cortas de ADN conocido** que se pegan a ambos extremos de cada fragmento.
 
 ```
-Muestra de ADN
-    ↓ fragmentación (mecánica o enzimática → fragmentos de ~150–1000 pb)
-    ↓ agregar adaptadores a los extremos (secuencias cortas conocidas, iguales para todos los fragmentos)
-    ↓ [opcional] enriquecer en regiones de interés:
-        • Captura: sondas magnéticas complementarias a los exones (exoma) → imán retiene solo esos fragmentos
-        • Amplificación selectiva por PCR: primers para la región deseada (ej: genes virales en muestra nasal)
-    ↓ → librería lista para secuenciar
+Fragmento crudo:
+        ATCGGCTATGCATTAGC...GCTATGCA
+                  ↓ ligación de adaptadores
+   [ADAPT]ATCGGCTATGCATTAGC...GCTATGCA[ADAPT]
+    ~20pb                               ~20pb
+```
+
+¿Para qué sirven los adaptadores?
+- **Anclaje:** en Illumina, los adaptadores se hibridan a los primers del flow cell para que el fragmento quede pegado a la superficie.
+- **Primer de inicio:** la polimerasa arranca desde el adaptador para leer el fragmento.
+- **Identificador (índice/barcode):** si se mezclan muestras de varios pacientes en un mismo flow cell, se usa un adaptador con un código único por muestra → al final se puede separar qué lectura viene de quién.
+
+```
+Librería completa (todos los fragmentos tienen los mismos adaptadores en los extremos):
+
+   [ADAPT]─── fragmento 1 ───[ADAPT]
+   [ADAPT]─── fragmento 2 ───[ADAPT]
+   [ADAPT]─── fragmento 3 ───[ADAPT]
+   [ADAPT]─── fragmento 4 ───[ADAPT]
+      ↑
+   (mismo adapt. en todos → el secuenciador puede anclarlos a todos)
+```
+
+---
+
+#### Paso 3 — [Opcional] Enriquecimiento en regiones de interés
+
+Secuenciar todo el genoma humano (~3Gb) es caro. Si solo me interesa el **exoma** (las regiones codificantes, ~1% del genoma) o un **panel de genes de enfermedad**, puedo enriquecer esas regiones antes de secuenciar. Hay dos estrategias:
+
+---
+
+**Estrategia A — Captura por hibridación (exoma o panel)**
+
+La idea: preparar sondas complementarias a las regiones que me interesan y usarlas como imanes moleculares.
+
+```
+Paso A1 — librería completa en solución:
+   [AD]─exón 1─[AD]      [AD]─intrón─[AD]     [AD]─exón 2─[AD]
+   [AD]─exón 3─[AD]      [AD]─basura─[AD]      [AD]─exón 4─[AD]
+   (todos mezclados, la mayoría son intrones o regiones no deseadas)
+
+Paso A2 — agregar sondas biotiniladas complementarias a los exones:
+   Sonda: ████████████ (complementaria al exón, con biotina en el extremo)
+              ||||||||||||
+   [AD]─exón 1─[AD]   ← se hibrida con la sonda
+   
+   Los intrones y regiones no deseadas no hibridan → quedan sueltos.
+
+Paso A3 — agregar bolitas con estreptavidina y un imán:
+   Estreptavidina ─── bolita magnética
+       │
+   biotina ─── sonda ─── [AD]─exón─[AD]   ← pegado
+
+   Imán: ▓▓▓▓▓▓▓▓▓▓▓▓
+                         ← bolitas (con exones pegados) van al imán
+                         ← intrones y basura quedan en solución → se descartan
+
+Paso A4 — lavar y eluir:
+   Resultado: solo los fragmentos de exones, listos para secuenciar
+```
+
+Ejemplo real: secuenciación de exoma completo (WES). Hay ~20 000 genes codificantes → el panel de sondas cubre todas las regiones exónicas del genoma. El resultado es ~50× menos datos que el genoma completo, a la misma profundidad de lectura.
+
+---
+
+**Estrategia B — Amplificación selectiva por PCR**
+
+En lugar de capturar con sondas, simplemente se hacen primers que flanquean solo la región de interés y se amplifica solo eso.
+
+```
+Genoma/mezcla de fragmentos:
+   ───────────────[REGIÓN DE INTERÉS]───────────────
+                  ↑                 ↑
+               Primer F          Primer R
+               (forward)         (reverse)
+
+PCR: solo amplifica lo que está entre los dos primers.
+Todo el resto del genoma → queda a concentración bajísima.
+
+Resultado:
+   [REGIÓN DE INTERÉS]  × 10⁶ copias  ← lista para secuenciar
+   resto del genoma     × 1 copia     ← ignorado
+```
+
+Ejemplo real del profesor: diagnóstico de COVID-19. La muestra nasal tiene ADN humano + posiblemente ARN viral. Con RT-PCR se hace:
+1. Retrotranscripción: ARN viral → ADN copia
+2. PCR con primers específicos para genes del virus (ej. gen N, gen E)
+3. Solo el ADN viral se amplifica → detectable; el genoma humano no interfiere
+
+---
+
+**Resumen del pipeline completo:**
+
+```
+ADN genómico
+    ↓ sonicación → fragmentos ~150–1000 pb con extremos irregulares
+    ↓ ligation de adaptadores → [ADAPT]─fragmento─[ADAPT]
+    ↓ [opcional] enriquecimiento:
+        ┌─ Captura: sondas + imán → quedan solo los fragmentos de interés
+        └─ PCR: primers flanqueantes → amplifican solo la región deseada
+    ↓
+  LIBRERÍA LISTA → entra al secuenciador (454, Illumina, PacBio, etc.)
 ```
 
 Los adaptadores son esenciales: el secuenciador los usa como sitio de anclaje y como primer para empezar a leer.
@@ -1265,76 +2246,107 @@ Desventaja: los poros proteicos son descartables (el cartucho con ~5000 poros se
 
 ---
 
-### Ensamblado de genomas — 3 pasos jerárquicos
+### Ensamblado de genomas
 
 ```
 LECTURAS (millones de fragmentos cortos de 100–300 pb)
-    │
-    │ Paso 1: Superponer lecturas → Contigs
-    │   - Alinear todas las lecturas contra todas (alineamiento LOCAL de a pares)
-    │   - Lecturas que solapan con alta identidad → unirlas
-    │   - Contigs = secuencias contiguas sin huecos (se conoce la secuencia de punta a punta)
-    ↓
-CONTIGS (secuencias de cientos de kb, sin gaps, secuencia conocida completa)
-    │
-    │ Paso 2: Usar pair-ends para ordenar contigs → Scaffolds
-    │   - Las lecturas apareadas vienen del mismo fragmento de ~1–5 kb
-    │   - Si un pair-end tiene una lectura en Contig A y la otra en Contig B:
-    │     → A y B están separados por (tamaño inserto - lecturas leídas) bases
-    │   - Scaffolds = contigs ordenados con HUECOS DE TAMAÑO CONOCIDO entre ellos
-    │   - (no sé qué bases van en el hueco, pero sé cuántas son)
-    ↓
-SCAFFOLDS (secuencias de Mb, con gaps de tamaño conocido)
-    │
-    │ Paso 3: Usar mapa físico (STS markers) → ordenar scaffolds → Cromosomas
-    │   - STS (Sequence Tagged Sites): marcadores moleculares de posición conocida
-    │   - Se mide distancia en unidades de Morgan (cM) por genética clásica de ligamiento
-    │   - Si un scaffold contiene un STS que por genética sé que está en tal posición
-    │     del cromosoma 7 → ubico ese scaffold en el cromosoma 7
-    │   - Solo necesario para genomas grandes (humanos, plantas)
-    │   - Bacterias/virus: suele alcanzar con los scaffolds o incluso con un solo contig
-    ↓
-GENOMA COMPLETO (secuencias por cromosoma)
+    ↓ Paso 1: solapamiento → Contigs
+CONTIGS (secuencias continuas, secuencia base a base conocida)
+    ↓ Paso 2: pair-end reads → Scaffolds
+SCAFFOLDS (contigs ordenados, huecos de tamaño conocido)
+    ↓ Paso 3: mapa físico (STS) → Cromosomas
+GENOMA COMPLETO
 ```
 
-**¿Dónde se guarda el ensamblado?**
-Las bases de datos almacenan las secuencias de los **contigs** (no del genoma completo como un solo archivo). En RefSeq los contigs tienen prefijo `NT_`. Al buscar un gen, siempre se obtiene la secuencia del contig correspondiente.
+Las bases de datos almacenan los contigs. En RefSeq tienen prefijo `NT_`. Al buscar un gen, siempre se obtiene la secuencia del contig correspondiente.
 
-#### De Bruijn Graph (estándar para NGS)
+#### Paso 1 — Generar contigs (OLC vs De Bruijn)
 
-El problema del ensamblado con millones de lecturas: no se puede hacer MSA ni comparar todas contra todas (O(n²)).
+**Razonamiento biológico:** el genoma que quiero ensamblar es desconocido. Todo lo que tengo son millones de lecturas. Si varias lecturas se solapan con alta identidad en sus extremos, deben venir de la misma región del genoma y puedo unirlas.
 
-**Solución Overlap-Layout-Consensus (OLC):** generar un grafo donde los nodos son las lecturas y las aristas son solapamientos. Para genomas con millones de reads → grafo gigante e inmanejable.
+**Método OLC (Overlap-Layout-Consensus) — el clásico:**
+1. **Overlap:** comparar todas las lecturas contra todas → para N lecturas, N² comparaciones → con millones de reads, extremadamente costoso.
+2. **Layout:** construir grafo donde nodos = lecturas y aristas = solapamientos. Buscar camino **hamiltoniano** (pasa por cada nodo una vez). El hamiltoniano es NP-completo → intratable con millones de reads.
+3. **Consensus:** con el orden definido, calcular la secuencia consenso.
 
-**Solución De Bruijn:** fijar el número de nodos de antemano → el tamaño del grafo no depende de la cantidad de lecturas.
+**Método De Bruijn — el estándar actual para NGS:**
+
+El grafo de De Bruijn resuelve el problema de OLC: la complejidad del grafo **no aumenta con el número de lecturas**.
+
+- Los **nodos** son los (k-1)-mers. El número máximo es 4^(k-1) — fijo para un k dado, sin importar cuántas lecturas haya.
+- Cada k-mer de una lectura genera **una arista** entre su prefijo (primeras k-1 bases) y su sufijo (últimas k-1 bases).
+- Agregar más lecturas solo añade peso a aristas existentes, no nuevos nodos.
 
 ```
-Definir k (longitud del k-mer)
-Nodos del grafo = todos los (k-1)-mers posibles (exactamente 4^(k-1) nodos posibles)
-Para cada lectura:
-    Partir la lectura en k-mers consecutivos
-    Cada k-mer = arista entre su prefijo (k-1) y su sufijo (k-1)
-    Si la arista ya existe → aumentar su peso (más lecturas la soportan)
+Lectura: AACGG (k=4)
+k-mers: AACG, ACGG
+Aristas: (AAC → ACG) y (ACG → CGG)
 
-Ensamblado = camino Euleriano (recorre todas las aristas una vez)
+Otra lectura también tiene AACG:
+    → la arista AAC→ACG aumenta su peso
+    → NO se agrega ningún nodo nuevo
 ```
 
-**Ventaja:** agregar más lecturas solo agrega peso a aristas existentes, no nuevos nodos → tamaño del grafo controlado.
+**Ensamblado = camino Euleriano** (recorre cada arista una vez). El euleriano tiene algoritmo eficiente O(E), mientras que el hamiltoniano es NP-completo → ventaja enorme.
 
-**Problemas del grafo (y cómo se originan):**
-- **Bifurcaciones:** errores de secuenciación crean k-mers alternativos (ej: ...CG vs ...TG en el mismo lugar)
-- **Burbujas:** errores o repeticiones generan caminos paralelos que convergen. Hay que discernir si son errores o variantes reales
+**Filtrado de errores:** un k-mer real aparece en ~100 aristas (cobertura). Un k-mer generado por error de secuenciación tiene peso 1. Los k-mers con peso anormalmente bajo se descartan → simplifica el grafo.
 
-| k chico | k grande |
-|---------|---------|
-| Más conexiones, más sensible a errores | Menos conexiones, menos errores |
-| Más rutas posibles (ambigüedades) | Más gaps (requiere mayor cobertura para conectar todo) |
+**Problemas del grafo:**
 
-**N50:** longitud L tal que el 50% del ensamble está en contigs de longitud ≥ L. A mayor N50, mejor ensamblado.
+| Estructura | Causa | Solución |
+|---|---|---|
+| **Bifurcación** | Error en extremo de lectura | El camino de menor peso es el error |
+| **Burbuja** | Error en el medio o polimorfismo real | Si ≤2 diferencias: colapsar (error). Si más: variante real |
+| **Ciclo/bucle** | Región repetitiva | Duplicar el nodo; cada copia queda en un contig separado |
 
-**SPAdes:** algoritmo multi-k (usa varios valores de k) — el más usado actualmente.
+**¿Cómo elegir k?**
+- k pequeño: más conexiones, más sensible a errores, más ambigüedades.
+- k grande: menos ambigüedades, pero necesita mayor cobertura.
+- **SPAdes** (programa más usado): usa múltiples k iterativamente.
+
+**N50:** longitud L tal que el 50% del genoma ensamblado está en contigs de largo ≥ L. A mayor N50, mejor.
+
+**Regla fundamental del profe:** "villeteras mata galán" — un algoritmo brillante con poca cobertura siempre pierde frente a un algoritmo mediocre con mucha cobertura.
+
+#### Paso 2 — Generar scaffolds (pair-end reads)
+
+**El problema después del paso 1:** los contigs son islas. Sé la secuencia interna de cada isla, pero no sé cuál va antes ni a qué distancia.
+
+**¿Qué es un pair-end read?** Al preparar la biblioteca, el ADN se fragmenta en trozos de tamaño controlado (2 kb, 10 kb, 50 kb). De cada fragmento se secuencian solo los dos extremos. El resultado es un par de lecturas que vienen del mismo fragmento original.
+
+**Diagrama de scaffolding:**
+```
+Contig A                          Contig B
+|============================|...hueco...|============================|
+        ---->                                    <----
+      lectura L                               lectura R
+        └──────────── inserto ~2 kb ──────────────────┘
+
+Si lectura L cae al final del Contig A
+y su par (lectura R) cae al principio del Contig B
+→ A y B están separados por ≈ (2000 - longL - longR) bases
+→ se puede estimar el tamaño del hueco
+```
+
+**¿Por qué 3 tamaños de inserto?** (ej.: 2 kb, 10 kb, 50 kb)
+- Insertos cortos (2 kb): unen contigs cercanos, scaffolding fino.
+- Insertos medios (10 kb): saltan sobre repeticiones cortas que romperían los contigs.
+- Insertos largos (50 kb): unen scaffolds grandes, ordenan regiones muy separadas.
+
+**Gap-filling:** los huecos se intentan rellenar con lecturas sueltas pair-ends de lecturas ya presentes en los contigs adyacentes al hueco.
+
+#### Contig vs scaffold vs cromosoma
+
+| | Contig | Scaffold | Cromosoma |
+|---|---|---|---|
+| ¿Secuencia completa conocida? | Sí, base a base | Solo en partes de contigs | Sí (genoma finalizado) |
+| ¿Hay huecos? | No | Sí, de **tamaño conocido** | No |
+| ¿Se sabe posición en genoma? | No | No | Sí |
+| Información que lo genera | Solapamiento de lecturas | Pair-end reads | Mapa físico (STS) |
 
 ---
+
+## Clase 6 — Genómica Humana y Medicina Personalizada
 
 ### Proyecto Genoma Humano — Historia y dos estrategias
 
@@ -1420,6 +2432,26 @@ El genoma de referencia sirve como punto de comparación para determinar las **v
 | Diferencia entre dos individuos cualesquiera | ~1 por mil → **1–5 millones de variantes** |
 
 > La complejidad humana no viene del número de genes (el gusano C. elegans tiene ~20,000 genes también), sino del splicing alternativo, modificaciones post-traduccionales y redes de regulación.
+
+---
+
+### GWAS — Genome Wide Association Studies
+
+**¿Qué es?** Un GWAS es un estudio epidemiológico a escala genómica. En lugar de secuenciar el genoma completo de cada individuo (costoso), se genotipifican ~500,000 a varios millones de SNPs en un chip (microarray de genotipado). Se compara la frecuencia de cada SNP entre casos (personas con la enfermedad) y controles (personas sin la enfermedad).
+
+Para cada SNP, se calcula si su frecuencia es significativamente diferente entre casos y controles. Un SNP con p < 5×10⁻⁸ (umbral corregido por ~1 millón de comparaciones múltiples) se considera **asociado** con la enfermedad.
+
+**Intuición estadística:** si en 10,000 personas con diabetes tipo 2 el alelo A en una posición aparece en el 40% de los cromosomas, pero en 10,000 controles sanos aparece solo en el 30%, esa diferencia es estadísticamente significativa → indica que en esa región del genoma hay algo relevante.
+
+**¿Qué permite descubrir?**
+- Regiones genómicas (loci) asociadas con enfermedades complejas (diabetes, esquizofrenia, cáncer, hipertensión, autismo).
+- Cuantificar la heredabilidad de un rasgo: ¿cuánta variación poblacional se explica por variantes genéticas comunes?
+- Construir **Polygenic Risk Scores (PRS)**: un puntaje de riesgo individual que combina la información de miles de SNPs asociados.
+
+**Limitaciones:**
+- El GWAS identifica regiones, no variantes causales directas.
+- Detecta variantes comunes (MAF >1–5%) con efectos generalmente pequeños.
+- Los primeros GWAS se hicieron casi exclusivamente en poblaciones europeas; las asociaciones pueden no transferirse a otras poblaciones.
 
 ---
 
@@ -1582,31 +2614,57 @@ Todas las variantes del genoma         ~1.000.000 – 5.000.000
 
 ### Bioinformática Traslacional y Medicina Personalizada
 
-**Definición:** uso de herramientas bioinformáticas (análisis de genomas, variantes, expresión génica) directamente en el contexto clínico para diagnóstico, prevención o tratamiento.
+**Concepto del profe:** la medicina personalizada no significa "solo mirar el genoma". Significa tener más información específica de ese individuo para personalizar diagnóstico, prevención y tratamiento: genotipo individual + fenotipo + ambiente + historia clínica. El genoma individual se puede agregar ahora como fuente de información adicional porque el costo bajó a niveles razonables.
 
-**Concepto de medicina personalizada:**
-- La medicina siempre fue "personalizada" (el médico considera el contexto del paciente)
-- Lo nuevo es que ahora se puede agregar el **genoma individual** como fuente de información adicional, a costo razonable
-- El diagnóstico de una enfermedad = genotipo + fenotipo + ambiente
-
-**Aplicaciones:**
 | Área | Ejemplo |
 |------|---------|
 | **Diagnóstico** | WES/WGS para enfermedades raras; diagnóstico prenatal no invasivo |
 | **Prevención** | Riesgo genético de cáncer (BRCA1/2); estado portador de enfermedades recesivas |
-| **Tratamiento** | Oncología de precisión (mutaciones del tumor → elección de quimio); farmacogenómica (cómo el paciente metaboliza una droga) |
+| **Tratamiento** | Oncología de precisión (mutaciones del tumor → elección de quimio); farmacogenómica |
 
-#### Caso real: Bainbridge et al. 2011
+#### Ejemplo 1 — HER2 y Herceptin (oncología de precisión)
+
+El gen **HER2** codifica un receptor de membrana que promueve la proliferación celular. En ~15–20% de los cánceres de mama, el gen HER2 está amplificado en las células tumorales (muchas copias → sobreexpresión masiva → proliferación descontrolada).
+
+**Herceptin (trastuzumab)** es un anticuerpo monoclonal que bloquea específicamente el receptor HER2. Es altamente efectivo en pacientes **HER2+**, pero completamente inútil en pacientes **HER2-**. Por eso, antes de prescribir Herceptin se realiza obligatoriamente genotipado del tumor (IHC + FISH) para determinar el estado HER2.
+
+```
+Biopsia tumoral → Determinación HER2 (IHC / FISH)
+    ↓
+HER2+  → Herceptin + quimioterapia → respuesta mucho mejor
+HER2-  → Herceptin no indicado → protocolo diferente
+```
+
+#### Ejemplo 2 — BRCA1/2 y cáncer de mama/ovario
+
+Las mutaciones de pérdida de función en **BRCA1** y **BRCA2** (genes de reparación del ADN) aumentan drásticamente el riesgo:
+
+| | Población general | Portadora BRCA1 | Portadora BRCA2 |
+|---|---|---|---|
+| Cáncer de mama (lifetime) | ~12% | **55–72%** | **45–69%** |
+| Cáncer de ovario | ~1.3% | **44%** | **17%** |
+
+Las portadoras pueden optar por: vigilancia intensiva (mamografías + RMN anuales desde los 25 años), quimioprevención, o cirugía preventiva (mastectomía bilateral profiláctica, que reduce el riesgo de cáncer de mama en ~90%).
+
+> **Caso público:** Angelina Jolie (2013) anunció su mastectomía preventiva al descubrir que era portadora de una mutación BRCA1.
+
+#### Ejemplo 3 — Farmacogenómica (CYP2C19 y clopidogrel)
+
+Clopidogrel es un anticoagulante para prevenir trombosis en stents coronarios. Es un pro-fármaco: necesita ser metabolizado por **CYP2C19** para volverse activo. El gen *CYP2C19* tiene variantes de pérdida de función relativamente comunes que reducen o eliminan la actividad de la enzima.
+
+Un paciente con dos alelos de pérdida de función es un **metabolizador pobre**: no convierte el clopidogrel a su forma activa → el fármaco no funciona → mayor riesgo de trombosis. La FDA recomienda genotipado de CYP2C19 antes de prescribir clopidogrel.
+
+#### Ejemplo 4 — Diagnóstico de enfermedades raras: caso Bainbridge et al. 2011
 
 **Pacientes:** dos hermanos con enfermedad neuro-muscular severa progresiva. No respondían a L-Dopa (tratamiento estándar para deficiencia dopaminérgica).
 
-**Estrategia bioinformática:**
+**Estrategia bioinformática (secuenciación de trio: paciente + padres):**
 1. Modelo genético → herencia **autosómica recesiva** (padres sanos, hijos enfermos)
 2. WGS de los hermanos y los padres
-3. Buscar variantes raras que segreguen: los padres heterocigotos, los hijos homocigotos o heterocigotos compuestos
+3. Buscar variantes raras que segreguen: los padres heterocigotos, los hijos **heterocigotos compuestos**
 4. Filtrar por efecto en proteína + rareza en gnomAD/dbSNP
 
-**Diagnóstico:** **heterocigotas compuestos para mutaciones en el gen SPR** (Sepiapterin Reductase):
+**Diagnóstico:** heterocigotos compuestos para mutaciones en el gen **SPR** (Sepiapterin Reductase):
 - alelo 1: p.Arg150Gly (missense)
 - alelo 2: p.Lys251X (nonsense — stop prematuro)
 
@@ -1616,11 +2674,26 @@ Ninguno de los dos alelos produce SPR funcional → **sin BH4** (tetrahidrobiopt
 
 **Tratamiento correcto:** L-Dopa + 5-OH-Triptófano (precursor de serotonina) + BH4.
 
-> **Heterocigota compuesto:** heterocigota a nivel de secuencia (dos mutaciones distintas, una en cada alelo) pero **homocigota funcional** (ningún alelo produce proteína funcional). Es la forma más común de herencia recesiva en poblaciones no consanguíneas.
+> **Heterocigota compuesto:** el paciente tiene dos mutaciones distintas en el mismo gen, una en cada alelo (una heredada del padre, otra de la madre). A nivel de secuencia es heterocigoto en cada posición mutada; a nivel funcional es equivalente a homocigoto recesivo: ninguno de los dos alelos produce proteína funcional. Es la forma más común de herencia recesiva en poblaciones no consanguíneas.
+
+**Filtrado progresivo para enfermedades raras:**
+```
+Todas las variantes del genoma:          ~4–7 millones
+    ↓ Con efecto en proteína (missense, nonsense, frameshift, splicing)
+                                         ~10,000–50,000
+    ↓ Raras en población (MAF <0.1% en gnomAD para enfermedad rara)
+                                         ~1,000–5,000
+    ↓ En genes biológicamente plausibles para la enfermedad
+                                         ~100–500
+    ↓ Que segregan con la enfermedad (análisis familiar o de novo)
+                                         ~5–50
+    ↓ Clasificadas patogénicas en ClinVar o predicción deletérea fuerte
+                                         1–5 candidatas causales
+```
 
 ---
 
-## 10. Parcial 2018 — Resolución Completa
+## Parcial 2018 — Resolución Completa
 
 ---
 
