@@ -10,7 +10,6 @@
 - [Clase 4 — Bases de Datos Secundarias](#clase-4)
 - [Clase 5 — NGS y Ensamblado de Genomas](#clase-5)
 - [Clase 6 — Genómica Humana y Medicina Personalizada](#clase-6)
-- [Parcial 2018 — Resolución](#parcial-2018)
 
 ---
 
@@ -220,6 +219,48 @@ El INSDC formado en 1988 explica por qué GenBank, EMBL y DDBJ son esencialmente
 | **KEGG** | Secundaria | Curada | Pathways metabólicos y de señalización |
 | **IntAct** | Secundaria | Curada | Interacciones proteína-proteína |
 | **DrugBank** | Secundaria | Curada | Fármacos con targets, mecanismo, farmacocinética |
+| **PubChem** | Primaria | No curada | Repositorio NCBI de compuestos químicos; el más grande de libre acceso |
+| **ChEMBL** | Secundaria | Curada | Compuestos bioactivos con actividad farmacológica (EBI) |
+| **Europe PMC** | Primaria | No curada | Literatura biomédica con texto completo; incluye preprints; API disponible |
+| **Web of Science** | Primaria | No curada | BD de literatura científica; comercial; amplia cobertura |
+| **Scopus** | Primaria | No curada | BD de literatura científica; comercial; alternativa a WoS |
+
+### Respuestas por categoría — pregunta tipo parcial
+
+El parcial suele pedir elegir y clasificar una BD de cada tipo. Respuesta para cada categoría:
+
+**a) Nucleótidos → GenBank (o RefSeq)**
+- **GenBank:** primaria, no curada, redundante. Repositorio NCBI donde cada laboratorio deposita sus secuencias directamente. Contiene múltiples registros del mismo gen (distintas versiones, distintos laboratorios). Miembro del INSDC.
+- Si se pide no redundante: **RefSeq** — primaria, parcialmente curada, no redundante. Una secuencia canónica por molécula física.
+
+**b) Proteínas → Swiss-Prot / UniProtKB**
+- **Swiss-Prot:** primaria, curada, no redundante. Revisión manual por expertos: función verificada, dominios, sitios activos, modificaciones. Una entrada por proteína funcional.
+- Si se necesita cobertura máxima: **TrEMBL** — primaria, no curada, redundante. Traducción automática de GenBank.
+- Criterio de elección: calidad → Swiss-Prot; cobertura → TrEMBL.
+
+**c) Expresión génica → GEO**
+- **GEO** (Gene Expression Omnibus, NCBI): primaria, no curada, redundante. Repositorio de experimentos de microarrays y RNA-seq. Los autores depositan datos crudos y procesados. Permite reanálisis de experimentos publicados.
+- Alternativa europea: **ArrayExpress** (EBI).
+
+**d) Organismo modelo → FlyBase / WormBase / SGD**
+- Bases de datos modelo-organismo (MOD): **secundarias**, **curadas**, **no redundantes**.
+- Integran toda la información disponible del organismo: genes, mutantes, fenotipos, interacciones, expresión. Son secundarias porque integran datos de múltiples fuentes primarias (GenBank, UniProt, publicaciones).
+- FlyBase → Drosophila; WormBase → C. elegans; SGD → S. cerevisiae; EcoCyc → E. coli.
+
+**e) Compuestos químicos → PubChem o DrugBank**
+- **PubChem** (NCBI): primaria, no curada, redundante. La más grande de libre acceso. Cubre compuestos orgánicos, inorgánicos, iones, mezclas.
+- **DrugBank:** secundaria, curada, no redundante. Especializada en fármacos: mecanismo de acción, targets moleculares, interacciones, farmacocinética. Mejor para información farmacológica confiable.
+- Criterio: cobertura → PubChem; calidad farmacológica → DrugBank.
+
+**f) Literatura (excluyendo PubMed) → Europe PMC**
+- **Europe PMC** (EBI): primaria, no curada. Incluye texto completo de artículos open access, preprints, y artículos de PubMed. Tiene API y herramientas de minería de texto. Ventaja sobre PubMed: acceso a texto completo.
+- Alternativas: **Web of Science** o **Scopus** — primarias, no curadas, comerciales, mayor cobertura de revistas multidisciplinarias.
+
+**g) Libre (opciones recomendadas para el parcial)**
+- **OMIM** (Online Mendelian Inheritance in Man): secundaria, curada. Genes y enfermedades genéticas humanas. Muy usada en genómica clínica.
+- **Pfam**: secundaria, curada. Familias de dominios proteicos con modelos HMM. Usada para anotación funcional.
+- **KEGG**: secundaria, curada. Vías metabólicas y funciones genómicas. Usada en análisis de enriquecimiento.
+- **Reactome**: secundaria, curada. Vías biológicas humanas con mayor detalle mecanístico que KEGG.
 
 ### Lo que se pregunta en el parcial sobre bases de datos
 
@@ -1051,6 +1092,35 @@ El mismo alineamiento con el mismo score tendrá distinto E-value en BDs distint
 - Score crudo: solo para analizar la matriz de sustitución.
 - Bitscore: para comparar alineamientos entre sí (sin búsqueda en BD).
 - E-value: siempre cuando se hace una búsqueda en BD y querés saber si el hit es significativo.
+
+---
+
+### Lectura del output de BLAST: Identities vs Positives
+
+El output de BLAST muestra tres números en el alineamiento:
+
+```
+Score = 142 bits (358),  Expect = 3e-40
+Identities = 68/102 (67%), Positives = 85/102 (83%), Gaps = 2/102 (2%)
+```
+
+- **Identities:** posiciones donde los dos aminoácidos son **idénticos** (mismo aa).
+- **Positives:** posiciones donde el score BLOSUM62 del par de aminoácidos es **> 0** (sustitución conservativa o identidad). No requiere que sean iguales.
+- **Gaps:** posiciones con indel.
+
+> **Regla clave:** Positives ≥ Identities siempre. Un cambio conservativo (ej. Leu→Val, score +1) cuenta como positivo pero no como identidad.
+
+Ejemplo concreto:
+```
+| Cambio             | Score BLOSUM62 | ¿Positive? | ¿Identity? |
+|--------------------|----------------|------------|------------|
+| Ser (S) → Ala (A)  | +1             | Sí         | No         |
+| Gln (Q) → Thr (T)  | 0              | No (neutro)| No         |
+| Asp (D) → Trp (W)  | -3             | No (malo)  | No         |
+| Leu (L) → Leu (L)  | +4             | Sí         | Sí         |
+```
+
+**Implicación:** si una búsqueda devuelve 40% identidad pero 70% positivos, hay muchos cambios conservativos → probablemente son homólogos con función similar aunque no idéntica.
 
 ---
 
@@ -1966,6 +2036,21 @@ Cobertura real          ← se calcula DESPUÉS (necesita definir el umbral prim
 
 Calidad del experimento: si profundidad media real ≈ profundidad target → pocas lecturas se perdieron en ruido.
 
+**Fórmula de Lander-Waterman:** la cobertura de cada base sigue una distribución de Poisson. La probabilidad de que una base quede sin leer es:
+
+```
+P(no cubierta) = e^(−D)   donde D = profundidad target
+
+  D = 1×  →  P = e^-1 ≈ 0.37  →  37% de bases sin leer  (inaceptable)
+  D = 5×  →  P = e^-5 ≈ 0.0067 →   0.67% sin leer
+  D = 10× →  P = e^-10 ≈ 0.00005 → prácticamente cero
+
+Consecuencia práctica: para 99% de cobertura a 1× umbral, necesitás D ≈ 5×.
+Para 99.9%, necesitás D ≈ 7×.
+```
+
+La mejora de cobertura con más lecturas es **logarítmica, no lineal**: duplicar las lecturas no duplica la cobertura.
+
 **Estándar clínico:** 30X para variant calling confiable. "Billetera mata galán": más cobertura → mejor resultado.
 
 ### Phred Quality Score
@@ -2693,348 +2778,119 @@ Todas las variantes del genoma:          ~4–7 millones
 
 ---
 
-## Parcial 2018 — Resolución Completa
+## Clase 7 — Anotación de Genomas Bacterianos
+
+### ¿Por qué anotar un genoma?
+
+Después del ensamblado, el resultado es una secuencia cruda de millones de bases sin sentido biológico. La **anotación** asigna información funcional a cada fragmento: dónde están los genes, qué proteínas codifican, qué función tienen.
+
+### Anotación estructural vs funcional
+
+**Anotación estructural:** identificar las coordenadas de los genes (dónde empieza y termina cada gen, en qué hebra, qué exones/intrones tiene).
+
+**Anotación funcional:** asignar una función biológica a esos genes (ej. "RNA polimerasa beta", "quinasa de histidina").
 
 ---
 
-### Problema 1 — Programación Dinámica NW
+### Predicción de genes (ORF finding)
 
-**Secuencias:** CTGGCT (horizontal) y ATGCTG (vertical)
-**Scoring:** Match = +2, Mismatch = 0, Gap = −1
-**Algoritmo:** Needleman-Wunsch (alineamiento **global**)
+Un **ORF (Open Reading Frame)** es una secuencia que empieza con un codón de inicio (generalmente ATG, a veces GTG en bacterias) y termina con un codón stop (TAA, TAG, TGA), sin stop en el medio.
 
-#### a) Matriz de score completa
+**Estrategia básica para bacterias:**
+1. Buscar todos los ATG en las 6 hebras posibles (3 marcos en cada hebra)
+2. Buscar codones stop corriente abajo en el mismo marco
+3. Filtrar por longitud mínima (ORFs muy cortos son probablemente ruido; en secuencias aleatorias hay un stop cada ~21 codones)
 
-|   | − | C | T | G | G | C | T |
-|---|---|---|---|---|---|---|---|
-| **−** | 0 | −1 | −2 | −3 | −4 | −5 | −6 |
-| **A** | −1 | 0 | −1 | −2 | −3 | −4 | −5 |
-| **T** | −2 | −1 | 2 | 1 | 0 | −1 | −2 |
-| **G** | −3 | −2 | 1 | 4 | 3 | 2 | 1 |
-| **C** | −4 | −1 | 0 | 3 | 4 | 5 | 4 |
-| **T** | −5 | −2 | 1 | 2 | 3 | **4** | **7** |
-| **G** | −6 | −3 | 0 | 3 | 4 | **3** | **6** |
-
-**Score final = 6** (celda esquina inferior derecha)
-
-**Justificación de celdas clave:**
-
-F(T,T) = F(5,6): T vs T → **match**
-- Diagonal: F(4,5) + 2 = 5 + 2 = **7** ← elegido
-- Arriba: F(4,6) − 1 = 4 − 1 = 3
-- Izquierda: F(5,5) − 1 = 4 − 1 = 3
-
-F(G,T) = F(6,6): G vs T → **mismatch**
-- Diagonal: F(5,5) + 0 = 4
-- Arriba: F(5,6) − 1 = 7 − 1 = **6** ← elegido
-- Izquierda: F(6,5) − 1 = 3 − 1 = 2
-
-F(G,C) = F(6,5): empate triple (diagonal=3, arriba=3, izquierda=3)
-
-#### b) ¿Existe más de un alineamiento óptimo?
-
-**Sí, existen exactamente dos.** El empate está en F(3,4) (fila G, columna G, cuarto elemento de fila 3):
-- Diagonal: F(2,3) + 2 = 1 + 2 = 3 (G=G match)
-- Izquierda: F(3,3) − 1 = 4 − 1 = 3
-
-Ambos caminos son válidos → dos alineamientos óptimos.
-
-**Alineamiento A** (camino diagonal en F(3,4)):
-```
-seq1 (CTGGCT): C  T  G  G  C  T  −
-seq2 (ATGCTG): A  T  −  G  C  T  G
-```
-
-**Alineamiento B** (camino izquierda en F(3,4)):
-```
-seq1 (CTGGCT): C  T  G  G  C  T  −
-seq2 (ATGCTG): A  T  G  −  C  T  G
-```
-
-#### c) Score de los alineamientos
-
-Ambos tienen score = **6**.
-
-**Verificación Alineamiento A:**
-| Col | seq1 | seq2 | Score |
-|-----|------|------|-------|
-| 1 | C | A | mismatch = 0 |
-| 2 | T | T | match = +2 |
-| 3 | G | − | gap = −1 |
-| 4 | G | G | match = +2 |
-| 5 | C | C | match = +2 |
-| 6 | T | T | match = +2 |
-| 7 | − | G | gap = −1 |
-**Total = 0+2−1+2+2+2−1 = 6** ✓
-
-**Verificación Alineamiento B:**
-| Col | seq1 | seq2 | Score |
-|-----|------|------|-------|
-| 1 | C | A | mismatch = 0 |
-| 2 | T | T | match = +2 |
-| 3 | G | G | match = +2 |
-| 4 | G | − | gap = −1 |
-| 5 | C | C | match = +2 |
-| 6 | T | T | match = +2 |
-| 7 | − | G | gap = −1 |
-**Total = 0+2+2−1+2+2−1 = 6** ✓
+**Por qué los genomas bacterianos son más fáciles de anotar que los eucariotas:**
+- No tienen intrones → el ORF es continuo
+- Alta densidad génica (~85–90% del genoma es codificante vs ~2% en humanos)
+- Tienen señales conservadas: promotores (-10 y -35), secuencia Shine-Dalgarno (sitio de unión al ribosoma, ~5–10 bases antes del ATG)
+- Codones de inicio alternativos bien documentados
 
 ---
 
-### Problema 2 — Bases de Datos Primarias
+### Métodos de predicción génica
 
-Para cada categoría: clasificar según curación, redundancia, tipo (primaria/secundaria).
+#### Métodos intrínsecos (solo la secuencia misma)
 
-#### a) BD de nucleótidos: **RefSeq** (NCBI)
+Buscan señales en la propia secuencia:
+- **Promotores** (-10: TATAAT, -35: TTGACA)
+- **Shine-Dalgarno** (GGAGG)
+- **Propiedades estadísticas del uso de codones** (las regiones codificantes tienen una distribución de codones característica, distinta de las no codificantes)
 
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **Curada** | NCBI revisa y anota cada registro manualmente |
-| Redundancia | **No redundante** | Un registro por molécula por organismo |
-| Tipo | **Primaria** | Almacena secuencias crudas experimentales |
+Herramienta clásica: **GeneMark / Glimmer** — construye un modelo de Markov oculto (HMM) con las frecuencias de codones del propio genoma, luego aplica el modelo para predecir cuándo una región es codificante.
 
-> Contraste: GenBank sería no curada y redundante.
+Problema: fallan en detectar el inicio exacto del gen (~40% de error en el inicio), aunque detectan el fin con mayor precisión.
 
-#### b) BD de proteínas: **Swiss-Prot / UniProtKB reviewed**
+#### Métodos extrínsecos (información externa)
 
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **Curada** | Revisión manual por expertos; cada entrada validada con literatura |
-| Redundancia | **No redundante** | 1 registro = 1 gen = 1 proteína; todas las isoformas en el mismo registro |
-| Tipo | **Primaria** | Almacena datos directamente obtenidos de experimentos bioquímicos |
+- **Homología:** hacer BLAST de la secuencia genómica contra proteínas conocidas. Si hay un hit significativo, la región es un gen y la función se transfiere.
+  - Problema: si no hay homólogos en la BD, no predice.
+- **Transcriptómica (RNA-seq):** secuenciar los ARNm directamente da certeza de que el gen se expresa y define con precisión los límites del gen.
+  - Problema: costoso, y genes expresados solo en condiciones especiales quedan sin detectar.
 
-> Contraste: TrEMBL sería no curada y más redundante.
+#### Transferencia por sintenia
 
-#### c) BD de expresión génica: **GEO** (NCBI)
+Si existe un genoma de referencia muy cercano (ej. otra cepa de la misma especie), se pueden detectar regiones de **sintenia** (mismos genes en el mismo orden) y copiar directamente la anotación.
 
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **No curada** | Datos depositados por autores sin revisión sistemática del contenido biológico |
-| Redundancia | **Redundante** | El mismo gen puede aparecer en miles de experimentos distintos; no hay criterio de unicidad |
-| Tipo | **Primaria** | Almacena datos crudos de experimentos de expresión génica |
+> **Sintenia:** conservación del orden y orientación de genes entre dos genomas. Si el gen 7 de la cepa A es una polimerasa y el genoma B tiene el mismo gen en la misma posición, también es una polimerasa.
 
-#### d) BD de organismo: **SGD** (Saccharomyces cerevisiae)
-
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **Curada** | Equipo SGD revisa y actualiza manualmente la anotación funcional de cada gen |
-| Redundancia | **No redundante** | Un registro por gen; variantes alélicas integradas en el mismo registro |
-| Tipo | **Secundaria** | Integra y organiza datos de múltiples BD primarias (GenBank, UniProt, PubMed) + anotación funcional derivada |
-
-#### e) BD de compuestos químicos: **PubChem** (NCBI)
-
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **No curada** | Estructuras depositadas automáticamente desde múltiples fuentes; sin revisión manual sistemática |
-| Redundancia | **Redundante** | El mismo compuesto puede aparecer bajo distintos nombres; PubChem intenta deduplicar (SID→CID) pero no elimina toda redundancia |
-| Tipo | **Primaria** | Almacena datos de estructura química directamente obtenidos o sintetizados |
-
-> Alternativa curada: **DrugBank** — curada, no redundante, secundaria.
-
-#### f) BD de literatura: **Europe PMC** (EBI)
-
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **Curada** | Los artículos han pasado por revisión editorial; metadatos (PMID, DOI, MeSH) revisados |
-| Redundancia | **No redundante** | Cada artículo tiene un identificador único |
-| Tipo | **Secundaria** | Recopila publicaciones que son en sí mismas productos secundarios del proceso científico |
-
-#### g) BD libre: **PDB** (Protein Data Bank)
-
-| Criterio | Clasificación | Justificación |
-|----------|--------------|---------------|
-| Curación | **Curada** | Deposición incluye validación estructural obligatoria (R-factor, clashscore, Ramachandran) |
-| Redundancia | **Redundante** | La misma proteína puede tener cientos de estructuras (distintos ligandos, mutantes, condiciones) |
-| Tipo | **Primaria** | Almacena datos crudos de experimentos estructurales (mapas de densidad electrónica, coordenadas atómicas) |
+Herramientas: **RATT, GATU**. Son más precisas que los métodos intrínsecos para definir los límites exactos de los genes.
 
 ---
 
-### Problema 3 — MSA, SP score, E-values, Prolina
+### PSSM para predicción de promotores
 
-**Contexto:** Motivo de N-glicosilación **N−X(≠P)−S/T**. MSA dado:
-```
-Prot1: L  E  N  K  T  V  A
-Prot2: V  −  N  E  S  Y  A
-Prot3: I  D  N  Q  T  I  A
-```
-**Penalidades gap affine:** apertura = −8, extensión = −3 → gap L=1: −8+(−3×1) = **−11**
+Se puede usar una **PSSM (Position-Specific Scoring Matrix)** para puntuar regiones promotoras potenciales:
 
-#### a) Scores por par y árbol de similitud
+1. Alinear promotores conocidos → obtener frecuencias de cada nucleótido en cada posición
+2. Para una nueva secuencia: multiplicar probabilidades posición a posición → score total
+3. Si el score supera un umbral → predicción de promotor
 
-**Par Prot1–Prot2** (S12):
+**Problema:** una posición con frecuencia 0 da score total = 0. Solución: aplicar **pseudocuentas** (frecuencia de fondo mínima) para evitar multiplicar por cero.
 
-| Pos | Prot1 | Prot2 | Score BLOSUM62 |
-|-----|-------|-------|----------------|
-| 1 | L | V | +1 |
-| 2 | E | − | −11 (gap L=1) |
-| 3 | N | N | +6 |
-| 4 | K | E | +1 |
-| 5 | T | S | +1 |
-| 6 | V | Y | −1 |
-| 7 | A | A | +4 |
-
-**S(1,2) = 1−11+6+1+1−1+4 = 1**
-
-**Par Prot1–Prot3** (S13):
-
-| Pos | Prot1 | Prot3 | Score BLOSUM62 |
-|-----|-------|-------|----------------|
-| 1 | L | I | +2 |
-| 2 | E | D | +2 |
-| 3 | N | N | +6 |
-| 4 | K | Q | +1 |
-| 5 | T | T | +5 |
-| 6 | V | I | +3 |
-| 7 | A | A | +4 |
-
-**S(1,3) = 2+2+6+1+5+3+4 = 23**
-
-**Par Prot2–Prot3** (S23):
-
-| Pos | Prot2 | Prot3 | Score BLOSUM62 |
-|-----|-------|-------|----------------|
-| 1 | V | I | +3 |
-| 2 | − | D | −11 (gap L=1) |
-| 3 | N | N | +6 |
-| 4 | E | Q | +2 |
-| 5 | S | T | +1 |
-| 6 | Y | I | −1 |
-| 7 | A | A | +4 |
-
-**S(2,3) = 3−11+6+2+1−1+4 = 4**
-
-**Resumen:**
-
-| Par | Score |
-|-----|-------|
-| Prot1–Prot3 | **23** (más similares → se unen primero) |
-| Prot2–Prot3 | 4 |
-| Prot1–Prot2 | 1 (menos similares) |
-
-**Árbol guía:**
-```
-        ┌── Prot1
-   ┌────┤
-   │    └── Prot3
-───┤
-   └──────── Prot2
-```
-
-**Justificación:** Prot1 y Prot3 comparten sustituciones conservativas sin gaps: L↔I (aliphatic), E↔D (ácidos), V↔I (aliphatic), T↔T (idéntico). Prot2 se aleja por el gap en posición 2 (−11) y la sustitución Y↔V poco conservativa (−1).
-
-#### b) SP score total
-
-SP = S(1,2) + S(1,3) + S(2,3) = 1 + 23 + 4 = **28**
-
-Verificación columna por columna:
-
-| Pos | S(1,2) | S(1,3) | S(2,3) | Subtotal |
-|-----|--------|--------|--------|----------|
-| 1 | 1 | 2 | 3 | 6 |
-| 2 | −11 | 2 | −11 | −20 |
-| 3 | 6 | 6 | 6 | 18 |
-| 4 | 1 | 1 | 2 | 4 |
-| 5 | 1 | 5 | 1 | 7 |
-| 6 | −1 | 3 | −1 | 1 |
-| 7 | 4 | 4 | 4 | 12 |
-| **Total** | | | | **28** ✓ |
-
-#### c) Ordenamiento de E-values: E12, E13, E23
-
-E-value es exponencialmente inverso al score: E = K·m·n·e^(−λS).  
-A mayor score → **menor** E-value (más significativo).
-
-Scores: S13 = 23 > S23 = 4 > S12 = 1
-
-**E₁₃ < E₂₃ < E₁₂**
-
-El par 1–3 tiene el score más alto → menos probable de verse por azar → E-value más bajo = más significativo. El par 1–2 tiene score más bajo → más probable por azar → E-value más alto.
-
-#### d) ¿Por qué la Prolina no se acepta en posición X del motivo?
-
-**Razón estructural:** La Prolina es el único aa cuya cadena lateral forma un anillo con el nitrógeno del backbone (anillo pirrolidínico). Esto:
-
-1. Elimina el H del N amídico → **no puede formar puentes H** con el backbone.
-2. Restringe severamente el ángulo φ → **fuerza un quiebre (kink) en la estructura**.
-3. **Impide que el tripéptido N-P-S/T adopte la conformación de β-turn** que necesita la enzima oligosacariltransferasa (OST) para reconocer y glicosilar el residuo N.
-
-**¿Qué dice BLOSUM62?** La fila P en BLOSUM62 muestra scores negativos con prácticamente todos los aminoácidos (P−L = −3, P−I = −3, P−F = −4, P−W = −4, solo P−P = +7). Esto indica que la **Prolina es evolutivamente muy poco intercambiable** — sus sustituciones son seleccionadas negativamente porque alteran drásticamente la estructura local. La matriz refleja la excepcionalidad estructural de la prolina, que es exactamente la razón por la que elimina el sitio de glicosilación.
+El umbral se define empíricamente: mínimo score de los promotores conocidos (similar al *trusted cutoff* de Pfam).
 
 ---
 
-### Problema 4 — Bases de Datos Secundarias, PFAM y HMMer
+### Herramientas de anotación automática
 
-#### A) Construcción del HMM con HMMer
+| Herramienta | Predicción génica | Anotación funcional | Formato NCBI |
+|-------------|-------------------|---------------------|--------------|
+| **Prokka** | Prodigal | BLAST contra BD curadas + Pfam + TIGRFAM | Sí |
+| **RAST** | Glimmer + reentrenamiento | FigFams (familias curadas por subsistemas) | No |
+| **Glimmer** | Markov interpolado | — (solo genes) | — |
 
-**Problema bioinformático:** Dado un conjunto de sustratos confirmados de KC, construir un **profile-HMM** que capture la variabilidad posicional del motivo de reconocimiento para detectar nuevos sustratos en el proteoma de Av.
+**Prokka** es el más usado internacionalmente y genera formato aceptado por el NCBI para publicación.
 
-**Pipeline:**
+**RAST** usa el concepto de **FigFams**: grupos de proteínas con la misma función (alta identidad + misma posición en el metabolismo). La asignación a FigFams se basa en:
+- Firmas de k-mers (secuencias de 8 aa presentes en todos los miembros de la familia)
+- **BBH (Best Bidirectional Hit):** A hace BLAST vs B → encuentra A'. A' hace BLAST vs A → si vuelve a A → son ortólogos con alta confianza.
 
-```
-1. Set de entrenamiento
-   Secuencias de sustratos confirmados de KC
-         ↓
-2. MSA (CLUSTAL / MAFFT)
-   Alinear las regiones de reconocimiento
-         ↓
-3. hmmbuild → KC_motivo.hmm
-   Estima: P(aa | posición), P(match→insert), P(match→delete)
-   = PROBLEMA DE ENTRENAMIENTO
-         ↓
-4. Calibración (automática con hmmbuild)
-   Genera parámetros para calcular E-values
-         ↓
-5. hmmsearch → busca en proteoma de Av
-   Lista de candidatos con score y E-value
-   = PROBLEMA DE PUNTAJE
-         ↓
-6. Validación experimental (100 candidatos)
-   Ensayos de unión y fosforilación
-         ↓
-7. Evaluación: curva ROC, sensibilidad, especificidad
-```
+---
 
-**Métricas:**
-- **Sensibilidad** = VP / (VP + FN): fracción de sustratos reales detectados.
-- **Especificidad** = VN / (VN + FP): fracción de no-sustratos correctamente rechazados.
-- Curva ROC: barrer umbrales de E-value → tradeoff sensibilidad/especificidad.
+### Anotación funcional: transferencia y limitaciones
 
-#### B) Interpretación del Logo del HMM
+Una vez predichos los ORFs, se busca función por homología (BLAST contra UniProt, Swiss-Prot, etc.).
 
-Un **sequence logo** representa cada posición del HMM como una columna de letras donde:
-- **Altura total** = bits de información = conservación (máx ≈ 4.32 bits = log₂20)
-- **Altura de cada letra** = frecuencia relativa (probabilidad de emisión) de ese aa en esa posición
+**Niveles de confianza:**
+- **Evidencia experimental directa** (el gen fue caracterizado en laboratorio): más confiable
+- **Alta identidad (>80%) + alta cobertura**: función transferida directamente
+- **Identidad moderada (40–80%)**: función putativa o "similar a"
+- **Baja identidad (<40%)**: "proteína hipotética conservada"
+- **Sin homología:** "proteína hipotética" (gen predicho, función desconocida)
 
-**5 propiedades que se pueden leer:**
+**Riesgo de propagación de errores:** si la proteína de referencia está mal anotada, el error se transfiere a todos los genomas que la usen como referencia. Por eso las BDs curadas (Swiss-Prot) son cruciales.
 
-**1. Conservación posicional:** columnas altas = posiciones muy conservadas = **determinantes de especificidad** del reconocimiento por KC (si se mutan, eliminan la unión o la fosforilación).
+---
 
-**2. Identidad fisicoquímica del residuo dominante:** la letra más alta revela qué tipo de residuo requiere KC:
-- K o R → quinasa basofílica (como PKA/PKC)
-- D o E → quinasa acidofílica (como CK2)
-- F, W, Y → bolsillo hidrofóbico aromático
+### Diferencia bacteria vs eucariota
 
-**3. Tolerancia a sustituciones conservativas:** cuando una columna muestra 2–4 letras de altura apreciable, el modelo acepta variación conservativa. Si aparecen S y T juntas → KC solo requiere un hidroxilo; si K y R → requiere carga positiva, acepta cualquier básico.
+| Característica | Bacterias | Eucariotas |
+|----------------|-----------|------------|
+| Intrones | No | Sí → hay que predecir sitios de splicing |
+| Densidad génica | 85–90% | ~2% (humanos) |
+| Promotores | -10/-35 conservados | Menos conservados, más variados |
+| Complejidad | Baja | Alta |
+| Precisión de predictores | >99% de genes encontrados | Menor |
 
-**4. Posiciones variables:** columnas bajas = KC no impone restricciones ahí = residuos equivalentes a la "X" del motivo N-glicosilación.
-
-**5. Extensión del motivo:** número total de columnas = largo del motivo lineal reconocido (20–25 aa en el enunciado).
-
-#### C) Búsqueda en el proteoma de Av y falsos positivos
-
-```bash
-hmmsearch -E 0.001 KC_motivo.hmm proteoma_Av.fasta > candidatos.tbl
-```
-
-**Resultado:** Al evaluar 100 candidatos experimentalmente, 5 no se unen ni son fosforilados por KC.
-
-**Nombre del resultado:** **Falsos Positivos (FP)**
-
-El HMM predijo 100 proteínas como sustratos (positivos), pero 5 resultaron no serlo.
-**Precisión = 95/100 = 95%.**
-
-**¿Por qué ocurren los FP?**
-1. El motivo existe en la secuencia pero está **enterrado en la estructura 3D** → KC no puede acceder in vivo.
-2. Set de entrenamiento pequeño → el modelo aprendió señales espurias (sobreajuste).
-3. **Contexto celular:** KC requiere co-localización, andamiajes o fosforilaciones previas no capturables por secuencia lineal.
-4. Umbral de E-value permisivo → hits marginalmente similares al modelo.
