@@ -416,43 +416,81 @@ El HMM es más sensible porque tolera variaciones → detecta homólogos diverge
 
 ### Problema 1 — NW (alineamiento global)
 
-**Secuencias:** CTGGCT (filas) y ATGCTG (columnas)
+**Secuencias:** CTGGCT (columnas, horizontal) y ATGCTG (filas, vertical)
 **Scoring:** Match = +2, Mismatch = 0, Gap = −1
 
 **Matriz completa:**
 
-|   | − | A | T | G | C | T | G |
+|   | − | C | T | G | G | C | T |
 |---|---|---|---|---|---|---|---|
 | **−** | 0 | −1 | −2 | −3 | −4 | −5 | −6 |
-| **C** | −1 | 0 | −1 | −2 | −1 | −2 | −3 |
-| **T** | −2 | −1 | 2 | 1 | 0 | 1 | 0 |
-| **G** | −3 | −2 | 1 | 4 | 3 | 2 | 3 |
-| **G** | −4 | −3 | 0 | 3 | 3 | 2 | 4 |
-| **C** | −5 | −4 | −1 | 2 | 5 | 4 | 3 |
-| **T** | −6 | −5 | −2 | 1 | 4 | 7 | 6 |
+| **A** | −1 | 0 | −1 | −2 | −3 | −4 | −5 |
+| **T** | −2 | −1 | 2 | 1 | 0 | −1 | −2 |
+| **G** | −3 | −2 | 1 | 4 | 3 | 2 | 1 |
+| **C** | −4 | −1 | 0 | 3 | 4 | 5 | 4 |
+| **T** | −5 | −2 | 1 | 2 | 3 | **4** | **7** |
+| **G** | −6 | −3 | 0 | 3 | 4 | **3** | **6** |
 
-**Score final = 6** (esquina inferior derecha → celda T/G)
+**Score final = 6** (celda esquina inferior derecha: fila G, columna T)
 
-Justificación de celdas del traceback:
+**Justificación de celdas clave del traceback:**
 
-- F(T,T) fila 6, col 5: T=T match → diagonal F(5,4)+2 = 5+2 = **7** ← elegido
-- F(T,G) fila 6, col 6: mismatch → arriba F(5,6)−1 = 7−1 = **6** ← elegido
-- F(G,G) fila 4, col 3: empate diagonal (F(3,2)+2=1+2=3) e izquierda (F(4,2)−1=4−1=3) → **dos caminos**
+F(T,T) — fila T (pos 5), col T (pos 6): T = T → **match**
+- Diagonal: F(4,5) + 2 = 5 + 2 = **7** ← elegido
+- Arriba:    F(4,6) − 1 = 4 − 1 = 3
+- Izquierda: F(5,5) − 1 = 4 − 1 = 3
+
+F(G,T) — fila G (pos 6), col T (pos 6): G ≠ T → **mismatch**
+- Diagonal:  F(5,5) + 0 = 4
+- Arriba:    F(5,6) − 1 = 7 − 1 = **6** ← elegido
+- Izquierda: F(6,5) − 1 = 3 − 1 = 2
+
+F(G,G) — fila G (pos 3), col G (pos 3): G = G → **empate**
+- Diagonal:  F(2,2) + 2 = 1 + 2 = **3**
+- Izquierda: F(3,2) − 1 = 4 − 1 = **3**
+→ dos caminos posibles → dos alineamientos óptimos
 
 **¿Existe más de un alineamiento óptimo? Sí — exactamente dos:**
 
+**Alineamiento A** (traceback diagonal en el empate de F(G,G)):
 ```
-Alineamiento A (diagonal en el empate):
-  CTGGCT−
-  AT−GCTG
-
-Alineamiento B (izquierda en el empate):
-  CTG−GCT−
-  A T G C T G
-
-Score A: 0+2−1+2+2+2−1 = 6 ✓
-Score B: 0+2+2−1+2+2−1 = 6 ✓
+seq1 (CTGGCT): C  T  G  G  C  T  −
+seq2 (ATGCTG): A  T  −  G  C  T  G
 ```
+
+Verificación columna por columna:
+
+| Col | seq1 | seq2 | Score |
+|-----|------|------|-------|
+| 1 | C | A | mismatch = 0 |
+| 2 | T | T | match = +2 |
+| 3 | G | − | gap = −1 |
+| 4 | G | G | match = +2 |
+| 5 | C | C | match = +2 |
+| 6 | T | T | match = +2 |
+| 7 | − | G | gap = −1 |
+| **Total** | | | **0+2−1+2+2+2−1 = 6 ✓** |
+
+**Alineamiento B** (traceback izquierda en el empate de F(G,G)):
+```
+seq1 (CTGGCT): C  T  G  G  C  T  −
+seq2 (ATGCTG): A  T  G  −  C  T  G
+```
+
+Verificación columna por columna:
+
+| Col | seq1 | seq2 | Score |
+|-----|------|------|-------|
+| 1 | C | A | mismatch = 0 |
+| 2 | T | T | match = +2 |
+| 3 | G | G | match = +2 |
+| 4 | G | − | gap = −1 |
+| 5 | C | C | match = +2 |
+| 6 | T | T | match = +2 |
+| 7 | − | G | gap = −1 |
+| **Total** | | | **0+2+2−1+2+2−1 = 6 ✓** |
+
+Ambos tienen score = 6. Los dos son alineamientos globales óptimos válidos.
 
 ---
 
@@ -474,7 +512,8 @@ Clasificar una BD de cada tipo según curación, redundancia y tipo (primaria/se
 
 ### Problema 3 — MSA, SP score, E-values, Prolina
 
-**MSA dado** — motivo N-glicosilación N−X(≠P)−S/T, gap affine: apertura=−8, extensión=−3 (gap de largo 1 = −8+(−3)= −11):
+**MSA dado** — motivo N-glicosilación N−X(≠P)−S/T
+Gap affine: apertura = −8, extensión = −3 → gap de largo 1 = −8 + (−3×1) = **−11**
 
 ```
 Prot1: L  E  N  K  T  V  A
@@ -484,62 +523,149 @@ Prot3: I  D  N  Q  T  I  A
 
 **Scores por par (BLOSUM62):**
 
-| Par | L/V I/V | E/− E/D | N/N | K/E K/Q | T/S T/T | V/Y V/I | A/A | **Total** |
-|-----|---------|---------|-----|---------|---------|---------|-----|-----------|
-| P1–P2 | L/V = +1 | E/− = −11 | N/N = +6 | K/E = +1 | T/S = +1 | V/Y = −1 | A/A = +4 | **1** |
-| P1–P3 | L/I = +2 | E/D = +2 | N/N = +6 | K/Q = +1 | T/T = +5 | V/I = +3 | A/A = +4 | **23** |
-| P2–P3 | V/I = +3 | −/D = −11 | N/N = +6 | E/Q = +2 | S/T = +1 | Y/I = −1 | A/A = +4 | **4** |
+| Pos | P1–P2 | P1–P3 | P2–P3 |
+|-----|-------|-------|-------|
+| 1 | L/V = +1 | L/I = +2 | V/I = +3 |
+| 2 | E/− = −11 | E/D = +2 | −/D = −11 |
+| 3 | N/N = +6 | N/N = +6 | N/N = +6 |
+| 4 | K/E = +1 | K/Q = +1 | E/Q = +2 |
+| 5 | T/S = +1 | T/T = +5 | S/T = +1 |
+| 6 | V/Y = −1 | V/I = +3 | Y/I = −1 |
+| 7 | A/A = +4 | A/A = +4 | A/A = +4 |
+| **Total** | **1** | **23** | **4** |
 
-**SP score total = 1 + 23 + 4 = 28**
+**SP score total = S(1,2) + S(1,3) + S(2,3) = 1 + 23 + 4 = 28**
 
-**Árbol guía UPGMA:** mayor score = P1–P3 (23) → se unen primero → árbol: `((Prot1, Prot3), Prot2)`.
+Verificación columna a columna:
+
+| Pos | S(1,2) | S(1,3) | S(2,3) | Subtotal |
+|-----|--------|--------|--------|----------|
+| 1 | 1 | 2 | 3 | 6 |
+| 2 | −11 | 2 | −11 | −20 |
+| 3 | 6 | 6 | 6 | 18 |
+| 4 | 1 | 1 | 2 | 4 |
+| 5 | 1 | 5 | 1 | 7 |
+| 6 | −1 | 3 | −1 | 1 |
+| 7 | 4 | 4 | 4 | 12 |
+| **Total** | | | | **28 ✓** |
+
+**Árbol guía UPGMA:** S(1,3)=23 es el mayor → Prot1 y Prot3 se unen primero.
+```
+        ┌── Prot1
+   ┌────┤
+   │    └── Prot3
+───┤
+   └──────── Prot2
+```
+Prot1 y Prot3 comparten sustituciones conservativas sin gaps: L↔I (alifáticos), E↔D (ácidos), T↔T, V↔I. Prot2 se aleja por el gap en posición 2 (−11) y Y↔V (−1).
 
 **Orden de E-values:** S₁₃=23 > S₂₃=4 > S₁₂=1  →  **E₁₃ < E₂₃ < E₁₂**
-(mayor score = menor probabilidad de verlo por azar = E-value más bajo = más significativo)
+
+E-value = K·m·n·e^(−λS). A mayor score → menor exponente → menor E-value → más significativo. El par 1–3 es el menos probable de verse por azar.
 
 **¿Por qué la Prolina no se acepta en posición X del motivo N−X(≠P)−S/T?**
 
-La Prolina tiene un anillo pirrolidínico que une la cadena lateral al nitrógeno del backbone:
-- Elimina el H del N amídico → no puede formar puentes de hidrógeno con el backbone.
-- Restringe severamente el ángulo φ → fuerza un kink en la cadena.
-- Impide que el tripéptido adopte la conformación de β-turn que necesita la enzima OST (oligosacariltransferasa) para reconocer la Asn y añadir el oligosacárido.
+La Prolina tiene un anillo pirrolidínico que forma un enlace covalente entre la cadena lateral y el nitrógeno del backbone. Esto produce tres efectos:
 
-BLOSUM62 confirma: casi todos los scores de la fila P son negativos → la Pro es evolutivamente muy poco intercambiable, lo que refleja su excepcionalidad estructural.
+1. **Elimina el H del N amídico** → no puede formar puentes de hidrógeno con el backbone.
+2. **Restringe severamente el ángulo φ** → fuerza un kink (quiebre) en la cadena polipeptídica.
+3. **Impide la conformación de β-turn** que necesita la enzima oligosacariltransferasa (OST) para reconocer el motivo N-X-S/T y transferir el oligosacárido a la Asn.
+
+BLOSUM62 confirma la excepcionalidad de la Pro: casi todos los scores de su fila son negativos (P–L = −3, P–I = −3, P–F = −4, solo P–P = +7). Esto refleja que la Pro es evolutivamente muy poco intercambiable, exactamente porque sus sustituciones destruyen la estructura local.
 
 ---
 
 ### Problema 4 — HMM y PFAM (quinasa KC)
 
-**Pipeline completo (KC quinasa, búsqueda en proteoma de Av):**
+**Pipeline completo para buscar sustratos en el proteoma de Av:**
 
 ```
-Sustratos confirmados de KC (verdaderos positivos)
+Sustratos confirmados de KC (verdaderos positivos experimentales)
          ↓
 MSA de las regiones de reconocimiento (CLUSTAL / MAFFT)
+         ↓                      ← PROBLEMA DE ENTRENAMIENTO
+hmmbuild → KC_motivo.hmm
+  Estima: P(aa | posición) por columna   → prob. de emisión
+          P(M→M), P(M→I), P(M→D)        → prob. de transición
          ↓
-hmmbuild → KC_motivo.hmm          ← ENTRENAMIENTO
-  estima P(aa|posición), P(M→I), P(M→D)
+Calibración automática → parámetros λ y K para calcular E-values
+         ↓                      ← PROBLEMA DE SCORING
+hmmsearch -E 0.001 KC_motivo.hmm proteoma_Av.fasta
+  Produce lista de candidatos ordenados por score y E-value
          ↓
-Calibración (automática) → parámetros para calcular E-values
+Validación experimental: 100 candidatos → ensayos de unión y fosforilación
          ↓
-hmmsearch en proteoma de Av → lista de candidatos con E-value   ← SCORING
-         ↓
-Validar experimentalmente 100 candidatos
-         ↓
-Evaluación: sensibilidad, especificidad, curva ROC
+Evaluación: curva ROC (sensibilidad vs 1−especificidad), ajuste del umbral
 ```
 
-**Interpretación del logo:**
-- Columna alta → determinante de especificidad de KC; mutar ese residuo elimina el reconocimiento.
-- Letra dominante revela tipo fisicoquímico: K/R → basofílica; D/E → acidofílica.
-- Columna baja → KC no impone restricción → equivalente a "X" en la expresión regular.
-- Número de columnas = estados MATCH del HMM = largo del motivo.
+**Análisis del logo HMM (KC quinasa) — respuesta completa de parcial:**
 
-**Resultado experimental:** 5 de 100 candidatos no son sustratos → **Falsos Positivos**.
+**1. Largo del motivo y estados MATCH**
+
+El logo tiene ~65 columnas → el HMM tiene 65 estados MATCH → el motivo reconocido por KC mide ~65 aa.
+Sin embargo, los extremos del logo tienen columnas muy bajas (poca información) → son posiciones poco conservadas que se pueden recortar. El núcleo funcional es de ~30 aa (las columnas con información apreciable en el centro del logo).
+
+**2. Triptófanos (W) fuertemente conservados**
+
+Hay varias posiciones con W (triptófano) como residuo dominante y columna alta. Esto es muy llamativo porque W es el aminoácido más grande, aromático, con anillo indol.
+
+*¿Qué significa?*
+- Las posiciones con W conservado probablemente forman una **superficie aromática** que encaja en el dominio beta-glove de KC (interacciones de apilamiento π-π o CH-π entre el W del sustrato y residuos aromáticos de KC).
+- W en el núcleo de la proteína estabiliza el plegamiento por empaquetamiento hidrofóbico aromático.
+- La conservación extrema de W indica que **no tolera sustitución**: si se reemplaza W por otro aminoácido (incluso F o Y, también aromáticos pero más pequeños), KC probablemente pierde la unión. Esto se puede validar por mutagénesis dirigida.
+
+*Experimento de validación:* mutar W → F (sustitución conservativa, mismo anillo aromático pero sin el N del indol) y luego W → A (sustitución disruptiva, elimina el anillo) → medir fosforilación in vitro. Si W→F mantiene actividad y W→A la elimina, confirma el rol del anillo; si ambas eliminan actividad, confirma que el indol específico es necesario.
+
+**3. Dos argininas (R) conservadas**
+
+Dos columnas con R (arginina) bien definidas y de altura considerable.
+
+*¿Qué significa?*
+- R tiene carga positiva (pKa ≈ 12.5, siempre cargada a pH fisiológico) y puede:
+  - Interactuar con residuos ácidos (D/E) del sitio activo o de superficie de KC (puentes salinos).
+  - Interactuar con el grupo fosfato del ATP durante la transferencia (mecanismo catalítico).
+  - Formar la "señal de reconocimiento básico" si KC es una quinasa basofílica (como PKA, que reconoce R-R-X-S/T).
+- La posición relativa de las dos R en el motivo puede ser clave: si están a distancia fija del sitio de fosforilación (S/T), KC las usa como ancla de posicionamiento.
+
+**4. Distancias fijas entre residuos conservados**
+
+La disposición regular de columnas altas a lo largo del logo indica que el espaciado entre W y R es constante en todos los sustratos.
+
+*¿Qué significa?*
+- El reconocimiento no es solo por identidad de aminoácido sino por **patrón espacial**: KC necesita que W esté a X posiciones de R.
+- Esto implica que la estructura 3D del sustrato en la región del motivo debe adoptar una conformación particular (ej: una hélice α posiciona los residuos en la misma cara cada ~3.5 posiciones; una lámina β los posiciona alternos).
+- Una expresión regular podría reflejar esto: `W-x(n)-R-x(m)-R-x(p)-[ST]` donde n, m, p son distancias fijas.
+
+**5. Región central variable con probabilidad de inserción/deleción**
+
+En el centro del logo hay una región con columnas de poca altura y, si se hace zoom, se ve la señal de inserción/deleción del HMM.
+
+*¿Qué significa?*
+- Esta región **no es reconocida directamente por KC**: es un loop o región flexible entre los elementos estructurales que sí importan.
+- El HMM la modela con estados I (inserción) y D (deleción): algunos sustratos tienen residuos extra aquí, otros tienen menos → el largo de esa región varía entre sustratos.
+- Esto es una ventaja del HMM sobre la expresión regular: la expresión regular no puede capturar bien esta variabilidad de largo; el HMM sí (estados I/D con sus probabilidades).
+
+**Síntesis — ¿qué dice el logo sobre el mecanismo de reconocimiento de KC?**
+
+KC reconoce un motivo estructurado de ~30 aa (núcleo) con:
+- Una o varias posiciones W que forman la interfaz hidrofóbica aromática con el dominio beta-glove de KC.
+- Dos posiciones R que anclan el sustrato por interacciones electrostáticas y posicionan el sitio S/T para la transferencia del fosfato.
+- Un espaciado fijo entre W y R que refleja la estructura 3D requerida.
+- Un loop central de largo variable que no contacta KC directamente.
+
+Esto caracteriza a KC como una quinasa con **especificidad de estructura terciaria**, no solo de secuencia primaria — lo que explica los falsos positivos: un sustrato puede tener la secuencia correcta pero si el loop o una estructura secundaria entierra el motivo, KC no puede acceder.
+
+**Resultado experimental:** 5 de 100 candidatos no son sustratos → **Falsos Positivos (FP)**
 - Precisión = 95/100 = 95%.
-- Causas: motivo enterrado en estructura 3D, sobreajuste del modelo con set de entrenamiento pequeño, dependencia de contexto celular no capturado por secuencia lineal.
+- Sensibilidad = VP / (VP + FN); Especificidad = VN / (VN + FP).
 
-Para aumentar especificidad: subir el umbral de E-value → los FP (scores más bajos) quedan por debajo del umbral → menos FP, pero se pierde algún VP marginal (más FN).
+Causas de los FP:
+1. El motivo existe en la secuencia pero está **enterrado en la estructura 3D** → KC no puede acceder in vivo.
+2. Set de entrenamiento pequeño → el modelo sobreajustó y aprendió señales espurias.
+3. KC requiere co-localización, andamiajes o fosforilaciones previas no capturables por secuencia lineal.
+4. Umbral de E-value permisivo → hits marginalmente similares al modelo.
+
+Para aumentar especificidad: subir el umbral de E-value → los FP (scores más bajos) quedan por debajo del corte → menos FP, pero algunos VP marginales pasan a ser FN.
 
 ---
 
@@ -648,3 +774,168 @@ B vs C:  A A A T C             Score = 1+1+1+1−1 = 3  ← mayor (sin gaps)
 - Árbol: `((B, C), A)`
 
 **MSA:** primero alinear B con C, luego agregar A al perfil (B+C).
+
+---
+
+## Parcial (año desconocido) — Ensamblado, Mapeo y Anotación
+
+### Ejercicio 1 — Grafo de De Bruijn con k=3
+
+**Lecturas:**
+
+| Lectura | Veces |
+|---------|-------|
+| ACTTTC | 15 |
+| ACTGTC | 1 |
+| TTCTGG | 14 |
+| TCTGGT | 1 |
+| TCTGGA | 8 |
+| ACTGGA | 7 |
+
+---
+
+#### a) Construcción del grafo de De Bruijn (k=3)
+
+Con k=3: nodos = 2-mers (k−1), aristas = 3-mers (k).
+Cada lectura de largo 6 genera 4 k-mers. La frecuencia de cada arista = suma de frecuencias de las lecturas que la generan.
+
+**Todos los k-mers y sus frecuencias:**
+
+| k-mer | Arista | Frecuencia | De qué lecturas viene |
+|-------|--------|------------|----------------------|
+| CTG | CT → TG | 31 | ACTGTC(1) + TTCTGG(14) + TCTGGT(1) + TCTGGA(8) + ACTGGA(7) |
+| TGG | TG → GG | 30 | TTCTGG(14) + TCTGGT(1) + TCTGGA(8) + ACTGGA(7) |
+| TTC | TT → TC | 29 | ACTTTC(15) + TTCTGG(14) |
+| ACT | AC → CT | 23 | ACTTTC(15) + ACTGTC(1) + ACTGGA(7) |
+| TCT | TC → CT | 23 | TTCTGG(14) + TCTGGT(1) + TCTGGA(8) |
+| CTT | CT → TT | 15 | ACTTTC(15) |
+| TTT | TT → TT | 15 | ACTTTC(15) |
+| GGA | GG → GA | 15 | TCTGGA(8) + ACTGGA(7) |
+| TGT | TG → GT | **1** | ACTGTC(1) ← posible error |
+| GTC | GT → TC | **1** | ACTGTC(1) ← posible error |
+| GGT | GG → GT | **1** | TCTGGT(1) ← posible error |
+
+**Grafo completo:**
+
+```
+                 CTT(15)      TTT(15, self)
+         ┌──────────────► TT ◄────────┐
+         │                │           │
+AC ─ACT(23)─► CT           └─TTC(29)─► TC ─TCT(23)─► CT
+                │                                      ▲
+                └─CTG(31)─► TG ─TGG(30)─► GG ─GGA(15)─► GA
+                                │              │
+                               TGT(1)         GGT(1)
+                                │              │
+                                ▼              ▼
+                               GT ─GTC(1)─► TC
+```
+
+---
+
+#### b) Camino óptimo y secuencia consenso
+
+**Criterio:** eliminar aristas con frecuencia = 1 (TGT, GTC, GGT) → son errores de secuenciación (ver inciso d).
+
+**Grafo simplificado** (sin aristas de frecuencia 1):
+
+```
+AC ─ACT─► CT ─CTT─► TT ─TTT(self)─► TT ─TTC─► TC ─TCT─► CT ─CTG─► TG ─TGG─► GG ─GGA─► GA
+```
+
+Grados en el grafo simplificado:
+- AC: entrada=0, salida=1 → **nodo inicio**
+- CT: entrada=2 (ACT, TCT), salida=2 (CTT, CTG) → balanceado
+- TT: entrada=2 (CTT, TTT-self), salida=2 (TTT-self, TTC) → balanceado
+- TC: entrada=1 (TTC), salida=1 (TCT) → balanceado
+- TG: entrada=1 (CTG), salida=1 (TGG) → balanceado
+- GG: entrada=1 (TGG), salida=1 (GGA) → balanceado
+- GA: entrada=1 (GGA), salida=0 → **nodo fin**
+
+→ Existe exactamente un **camino euleriano** (inicio en AC, fin en GA):
+
+```
+AC →ACT→ CT →CTT→ TT →TTT→ TT →TTC→ TC →TCT→ CT →CTG→ TG →TGG→ GG →GGA→ GA
+```
+
+**Secuencia consenso:** cada nodo aporta su primer carácter + el último carácter de la última arista:
+
+```
+AC + T + T + T + C + T + G + G + A = ACTTTCTGGA
+```
+
+**Verificación:** los reads de alta frecuencia son subcadenas de ACTTTCTGGA:
+- ACTTTC(15): posiciones 1–6 ✓
+- TTCTGG(14): posiciones 4–9 ✓
+- TCTGGA(8): posiciones 5–10 ✓
+
+**Justificación de la elección:** este es el único camino euleriano posible en el grafo simplificado. Traversa todas las aristas de alta frecuencia exactamente una vez. Maximiza la cobertura de las lecturas confiables.
+
+---
+
+#### c) ¿Cuántos nodos tiene el grafo vs el total posible?
+
+Con k=3, los nodos son 2-mers. Total posible: 4² = **16**.
+Nodos presentes en el grafo: AC, CT, TT, TC, TG, GT, GG, GA = **8 nodos**.
+
+El grafo usa 8/16 = 50% de los nodos posibles.
+
+**Ventaja bioinformática:** el grafo De Bruijn solo almacena los k-mers que realmente aparecen en las lecturas. Para genomas grandes con k=31 (estándar en ensambladores como SPAdes), existen 4³¹ ≈ 4.6×10¹⁸ k-mers posibles pero solo una fracción ínfima aparece en los datos. Esto hace que el algoritmo sea **eficiente en memoria**: la tabla hash solo guarda los k-mers observados, no el espacio completo. Cuanto mayor el k, menor la proporción de k-mers posibles que están presentes → mayor ahorro relativo.
+
+---
+
+#### d) Histograma de frecuencias y eliminación de errores
+
+**Histograma:**
+
+```
+Frecuencia
+   31 |  █
+   30 |  █
+   29 |  █
+   23 |  █  █
+   15 |  █  █  █
+    1 |  █  █  █
+       CTG TGG TTC ACT TCT CTT TTT GGA TGT GTC GGT
+```
+
+| Frecuencia | k-mers |
+|-----------|--------|
+| 31 | CTG |
+| 30 | TGG |
+| 29 | TTC |
+| 23 | ACT, TCT |
+| 15 | CTT, TTT, GGA |
+| **1** | **TGT, GTC, GGT** ← eliminar |
+
+**K-mers a eliminar:** TGT, GTC, GGT (frecuencia = 1).
+
+**¿Por qué?** Con una profundidad promedio de 15–31×, un k-mer verdadero debería aparecer muchas veces. Un k-mer con frecuencia = 1 es casi con certeza un **error de secuenciación**: si una base fue leída incorrectamente en una sola lectura, genera k-mers únicos que no aparecen en ninguna otra lectura. La probabilidad de que exactamente el mismo error ocurra dos veces es mínima.
+
+**Lecturas erróneas correspondientes:** ACTGTC(1) y TCTGGT(1) — ambas aparecen exactamente una vez. Comparten sus k-mers correctos (ACT, CTG, etc.) con otras lecturas, pero los k-mers únicos que aportan (TGT, GTC, GGT) delatan que son errores.
+
+**¿Se simplifica el grafo?** Sí:
+- Al eliminar TGT, GTC, GGT, el nodo GT queda sin aristas → se elimina.
+- El grafo pasa de 11 aristas y 8 nodos a **8 aristas y 7 nodos**.
+- Más importante: los nodos TG, GG y TC pasan a ser balanceados → el grafo tiene un único camino euleriano (AC → GA), lo que permite reconstruir la secuencia consenso sin ambigüedad.
+
+---
+
+### Ejercicio 2 — Definiciones
+
+**a) Genoma Humano de Referencia**
+
+Es una secuencia consenso del genoma humano diploide construida a partir de un número pequeño de individuos anónimos. No representa el genoma de ninguna persona en particular, sino una referencia coordinada y estable. Se usa como sistema de coordenadas universal para: mapear lecturas de secuenciación, reportar la posición de variantes, anotar genes, y comparar estudios entre laboratorios. La versión actual es GRCh38/hg38. Fue construido por el IHGSC (Human Genome Project) y es mantenido por el Genome Reference Consortium (GRC). Su limitación principal: no captura la diversidad de haplotipos humanos (es una secuencia mosaico de muy pocos individuos).
+
+**b) Variante**
+
+Diferencia entre la secuencia de un individuo y el genoma de referencia (o entre individuos de la misma especie). Tipos principales:
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| SNV / SNP | Cambio de una sola base | A→G en posición 12.345 |
+| Indel | Inserción o deleción pequeña (1–50 bp) | +AT en posición 6.789 |
+| CNV | Variación en el número de copias de una región | Duplicación del cromosoma 17q |
+| Variante estructural | Inversión, translocación, fusión | Fusión BCR-ABL en leucemia |
+
+Las variantes se clasifican clínicamente como: Patogénica, Probablemente patogénica, VUS (Variant of Uncertain Significance), Probablemente benigna, Benigna. Esta clasificación usa bases de datos como ClinVar, gnomAD y OMIM.
